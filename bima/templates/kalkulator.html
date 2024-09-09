@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Website Python</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co/6vmSLQP/background.webp");
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #fff;
+        }
+
+        #calculator {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            width: 360px;
+            max-width: 100%;
+        }
+
+        textarea {
+            width: calc(100% - 20px);
+            height: 150px;
+            padding: 10px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            margin-bottom: 15px;
+            resize: none;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="button"], button[type="submit"] {
+            width: 100%;
+            height: 60px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            border: none;
+            background-color: #fff;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        input[type="button"]:hover, button[type="submit"]:hover {
+            background-color: #f1f1f1;
+        }
+
+        button[type="submit"] {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .button-container button {
+            background-color: #ff5722;
+            color: #fff;
+        }
+
+        .button-container button:hover {
+            background-color: #e64a19;
+        }
+
+        .button-container .special {
+            background-color: #2196f3;
+        }
+
+        .button-container .special:hover {
+            background-color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kalkulator</h1>
+    <div id="calculator">
+        <form action="{% url 'kalkulator' %}" method="post">
+            {% csrf_token %}
+            <textarea name="expression" id="expression">{{ result }}</textarea>
+            <div class="button-container">
+                <input type="button" value="1" onclick="appendValue('1')">
+                <input type="button" value="2" onclick="appendValue('2')">
+                <input type="button" value="3" onclick="appendValue('3')">
+                <input type="button" value="4" onclick="appendValue('4')">
+                <input type="button" value="5" onclick="appendValue('5')">
+                <input type="button" value="6" onclick="appendValue('6')">
+                <input type="button" value="7" onclick="appendValue('7')">
+                <input type="button" value="8" onclick="appendValue('8')">
+                <input type="button" value="9" onclick="appendValue('9')">
+                <input type="button" value="0" onclick="appendValue('0')">
+                <input type="button" value="+" onclick="appendValue('+')">
+                <input type="button" value="-" onclick="appendValue('-')">
+                <input type="button" value="^2" onclick="appendValue('**2')">
+                <input type="button" value="*" onclick="appendValue('*')">
+                <input type="button" value="/" onclick="appendValue('/')">
+                <input type="button" value="%" onclick="appendValue('%')">
+                <input type="button" value="." onclick="appendValue('.')">
+                <input type="button" value="(" onclick="appendValue('(')">
+                <input type="button" value=")" onclick="appendValue(')')">
+                <button type="submit" name="sqrt">√</button>
+                <button type="submit" name="log">log</button>
+                <button type="submit" name="factorial">!</button>
+                <button type="submit" name="sin">sin</button>
+                <button type="submit" name="cos">cos</button>
+                <button type="submit" name="tan">tan</button>
+                <button type="submit" name="asin">asin</button>
+                <button type="submit" name="acos">acos</button>
+                <button type="submit" name="atan">atan</button>
+                <button type="submit" name="c_to_f">C to F</button>
+                <button type="submit" name="f_to_c">F to C</button>
+                <button type="submit" name="c_to_k">C to K</button>
+                <button type="submit" name="k_to_c">K to C</button>
+                <button type="submit" name="c_to_r">C to R</button>
+                <button type="submit" name="r_to_c">R to C</button>
+                <button type="submit" name="f_to_r">F to R</button>
+                <button type="submit" name="f_to_k">F to K</button>
+                <button type="submit" name="r_to_f">R to F</button>
+                <button type="submit" name="r_to_k">R to K</button>
+                <button type="submit" name="k_to_r">K to R</button>
+                <button type="submit" name="k_to_f">K to F</button>
+            </div>
+            <div>
+                <input type="button" value="C" onclick="clearInput()">
+                <input type="button" value="←" onclick="clearLastCharacter()">
+                <button type="submit" value="="> = </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function appendValue(value) {
+            document.getElementById("expression").value += value;
+        }
+
+        function clearInput() {
+            document.getElementById("expression").value = "";
+        }
+
+        function clearLastCharacter() {
+            var currentExpression = document.getElementById("expression").value;
+            document.getElementById("expression").value = currentExpression.slice(0, -1);
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- will be replaced with meta content -->
+{% block metatags %}{% endblock %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 18px;
+    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 50%, #2a5298 75%, #4b0082 100%); /* Ungu gelap di bagian bawah */
+    background-size: cover;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    flex: 1;
+}
+
+#nofooter {
+    flex: 1 0 auto;
+}
+
+.darkbtn {
+    color: #66ff99; 
+}
+
+.dark-mode {
+    background-color: black;
+    color: white;
+}
+
+#foot {
+    flex-shrink: 0;
+    font-family: sans-serif;
+    background-color: #2a5298;
+    color: white;
+    bottom: 0px;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.card-group, .card, .card-footer, .card-body {
+    border: none;
+    background: transparent;
+}
+
+.navbar, .footer {
+    background-color: #2a5298;
+}
+
+.nav-link {
+    color: black;
+}
+
+.nav-link:hover {
+    color: #ffcccb;
+}
+
+h5 {
+    color: #ffcccb;
+    text-align: center;
+}
+</style>
+
+</head>
+<body><div id="bodydiv"><div id="nofooter">
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="topnav">
+	<div class="container-fluid">
+	<a class="navbar-brand">
+	<img src="/static/assets/images/pp.png" width="30" height="30" class="d-inline-block rounded align-top" alt="logo" loading="lazy">KHARIZ</a>
+	<div class="nav justify-content-end">
+		<div class="d-inline"><a class="nav-link text-black font-weight-bold" href="/home/">Posts</a></div>
+		</div></div>
+</nav>
+<!-- will be replaced with post content -->
+{% block content %}
+{% endblock content %}
+</div>
+<footer class="footer" id="foot">
+<div class="container"><h5 style="text-align:center;">Enjoy the Blog and Stay Updated</h5>
+<nav class="navbar navbar-expand-lg">
+<div class="container-fluid">
+
+
+
+
+
+<p>Copyright © SecretDiscorder</p>
+
+
+
+
+
+<div class="nav justify-content-center" id="navfooter">
+<span><a class="nav-link text-black font-weight-bold" href="/profile/">About</a></span>
+<span><a class="nav-link text-black font-weight-bold" href="/">Portofolio</a></span>
+</div>
+</div>
+</nav>
+	</div>
+</footer></div>
+</body>
+</html>

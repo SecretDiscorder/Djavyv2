@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Qur'an Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co/6vmSLQP/background.webp");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+
+        label {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .textarea-container {
+            position: relative;
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-size: 18px;
+            color: white;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+            overflow: auto;
+        }
+
+        input[type="submit"],
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: white;
+            color: #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #f2f2f2;
+        }
+
+        .ayah,
+        .translation {
+            margin-bottom: 20px;
+        }
+
+        .translation {
+            font-style: italic;
+            color: #ddd;
+        }
+
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+    <script src="https://cdn.tiny.cloud/1/au7jtiu4kixba7aas817ehrwn82whplwo43q6b75klo7wa9s/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'fontsize print powerpaste casechange searchreplace autolink directionality visualblocks visualchars image link media mediaembed codesample table charmap pagebreak nonbreaking anchor tableofcontents insertdatetime advlist lists checklist wordcount tinymcespellchecker editimage help formatpainter permanentpen charmap linkchecker emoticons advtable export autosave advcode fullscreen',
+            menubar: 'tools',
+            toolbar: 'fontsizeselect print undo redo | fontfamily fontsize | bold italic underline forecolor backcolor | link image | alignleft aligncenter alignright alignjustify | code | codesample',
+            codesample_languages: [
+                { text: 'HTML/XML', value: 'markup' },
+                { text: 'JavaScript', value: 'javascript' }
+            ],
+            fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt',
+            height: 500,
+            setup: function(editor) {
+                editor.on('keydown', function(event) {
+                    if (event.keyCode == 9) { // tab pressed
+                        if (event.shiftKey) {
+                            editor.execCommand('Outdent');
+                        } else {
+                            editor.execCommand('Indent');
+                        }
+                        event.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <form method="post"> 
+        {% csrf_token %} 
+        <b>MASUKAN NOMOR SURAH Al-Quran</b>
+        <div class="surah-title">
+            <input id="surah-title" type="number" name="idsurah" value="1">
+        </div>
+        <input type="submit" value="View">
+        <div class="textarea-container">
+            <div class="ayah">
+                <textarea id="ayah">{{ ayah }}</textarea>
+            </div>
+            <div class="translation">
+                <textarea id="translation">{{ translate }}</textarea>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+

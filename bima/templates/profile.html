@@ -1,0 +1,429 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <title>Profile Page</title>
+    <style>
+      /* Reset styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Global styles */
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-bottom: 10px;
+        color: gold;
+        /* Custom color */
+      }
+
+      p,
+      li {
+        color: green;
+        /* Custom color */
+        margin-bottom: 5px;
+      }
+
+      a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      a:hover {
+        color: gold;
+        /* Custom color */
+      }
+
+      /* Sidebar Styles */
+      #sidebar {
+        position: fixed;
+        left: -250px;
+        width: 250px;
+        height: 100%;
+        background: #042331;
+        transition: all .5s ease;
+        z-index: 1000;
+        /* Ensure sidebar stays above content */
+      }
+
+      #sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      #sidebar ul a {
+        display: block;
+        height: 65px;
+        line-height: 65px;
+        font-size: 20px;
+        color: white;
+        padding-left: 20px;
+        text-decoration: none;
+        transition: .4s;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+      }
+
+      #sidebar ul a:hover {
+        background-color: #0a5275;
+        padding-left: 30px;
+      }
+
+      label #btn,
+      label #cancel {
+        position: absolute;
+        background: #042331;
+        border-radius: 3px;
+        cursor: pointer;
+        z-index: 1001;
+        /* Ensure button stays above content */
+      }
+
+      label #btn {
+        left: 20px;
+        top: 20px;
+        font-size: 30px;
+        color: white;
+        padding: 6px 12px;
+        transition: all .5s;
+      }
+
+      label #cancel {
+        left: -195px;
+        top: 20px;
+        font-size: 30px;
+        color: #0a5275;
+        padding: 4px 9px;
+        transition: all .5s ease;
+      }
+
+      #check {
+        display: none;
+      }
+
+      #check:checked~#sidebar {
+        left: 0;
+      }
+
+      #check:checked~label #btn {
+        left: 250px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #check:checked~label #cancel {
+        left: 195px;
+      }
+
+      #check:checked~section {
+        margin-left: 250px;
+      }
+
+      section {
+        background: url(bg.jpeg) no-repeat;
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        transition: all .5s;
+      }
+
+      /* Content styles */
+      .content {
+        max-width: 800px;
+        margin-top: 20px;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Semi-transparent background */
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        /* Green box shadow */
+        text-align: left;
+      }
+
+      .content h1,
+      .content h2,
+      .content h3,
+      .content h4,
+      .content h5,
+      .content h6 {
+        color: gold;
+        /* Custom color */
+      }
+
+      .content p {
+        color: green;
+        /* Custom color */
+      }
+
+      .content table {
+        width: 100%;
+        background-color: #011a33;
+        border: 5px solid;
+        border-radius: 20px;
+        border-color: #011a33;
+        color: green;
+        margin-bottom: 20px;
+      }
+
+      .content table th,
+      .content table td {
+        padding: 10px;
+        border: 1px solid #011a33;
+        text-align: left;
+      }
+
+      .content table th {
+        background-color: #101a21;
+      }
+
+      .content table td {
+        background-color: #042331;
+      }
+
+      /* Responsive styles */
+      @media screen and (max-width: 768px) {
+        .content {
+          padding: 10px;
+        }
+      }
+    </style>
+
+           
+  </head>
+  <body>
+    <header>
+      <input type="checkbox" id="check">
+      <label for="check">
+        <span id="btn">&#9776;</span>
+        <span id="cancel">&times;</span>
+      </label>
+      <nav id="sidebar">
+        <ul>
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="/static/jaya.pdf">Documentation</a>
+          </li>
+          <li>
+            <a href="https://github.com/SecretDiscorder">Project</a>
+          </li>
+          <li>
+            <a href="/profile">Achievement</a>
+          </li>
+          <li>
+            <a href="/static/2045.pdf">Programming Books</a>
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/1aXYmrKDgrmiLfpixH0QfnjhJi2p2a_l4/view">Auto Biography</a>
+          </li>
+          <li>
+            <a href="/project/">Gallery</a>
+          </li>
+          <li>
+            <a href="/base/">My Works</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <div class="content" align="center">
+      <br>
+      <br <iframe src="http://bimakharizdev.my.id/static/silence.mp3" allow="autoplay" id="audio" style="display: none" muted></iframe>
+      <div class="card_view2">
+        <div class="img" align="center">
+          <img src='/static/1703604416612.png' height="200" width="200" align="left">
+        </div>
+        <div class="name">
+          <h2>PrataDev</h2>
+          <h4>@SecretDiscorder</h4>
+        </div>
+        <div class="audio-container">
+          <iframe src="http://bimakharizdev.my.id/static/lagu.mp3" allow="autoplay" id="audio" style="display: none" muted>
+            <audio id="player" autoplay loop>
+              <source src="http://bimakharizdev.my.id/static/lagu.mp3" type="audio/mpeg">
+            </audio>
+            <audio id="myaudio" autoplay>
+              <source src="http://bimakharizdev.my.id/static/lagu.mp3" type="audio/mpeg">
+            </audio>
+            <script>
+              document.getElementById('myaudio').play();
+            </script>
+           
+          </iframe>
+        </div>
+        <div class="card">
+          <table align="center">
+            <tbody>
+              <tr>
+                <th>
+                  <h1>Name Card</h1>
+                </th>
+              </tr>
+              <tr>
+                <th>Nama</th>
+                <th> PrataDev</th>
+              </tr>
+              <tr>
+                <th>Status</th>
+                <th>Isekai</th>
+              </tr>
+              <tr>
+                <th>Hobby</th>
+                <th> Programer</th>
+              </tr>
+              <tr>
+                <th>Favorite</th>
+                <th>Ketenangan dan Bintang</th>
+              </tr>
+              <tr>
+                <th>Skill</th>
+                <th>
+                  <ul>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Speech-white">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Inovator-cyan">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Anime-white">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Antiquarian-brown">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Imitator-purple">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/HTML-orange">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/CSS-lightblue">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/CMS-white">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/Kodular-JAVA-brown">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/PYTHON-yellow">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/InformaticsLogic-black">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/BLANG-blue">
+                    </li>
+                    <li>
+                      <img alt="Static Badge" src="https://img.shields.io/badge/DJANGO-green">
+                    </li>
+                  </ul>
+                </th>
+              </tr>
+              <tr>
+                <th>Dream</th>
+                <th>
+                  <ul>
+                    <li>- A Programings teacher and software Enginering</li>
+                  </ul>
+                </th>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <br>
+          <p class="text"> Im a Basic Developer, follow me to be the first who see my new work. </p>
+          <br>
+          <br>
+        </div>
+        <br>
+        <div class="name1">
+          <br>
+          <div class="card" align="left">
+            <font color="red">
+              <h1>Life Map</h1>
+            </font>
+            <h2>2012-2013: (KinderGarden) TK</h2>
+            <h2>2014-2017: Elementary School</h2>
+            <h2>2017-2019: Elementary School</h2>
+            <h2>2019-2022: Junior High School</h2>
+            <h2>2022-Now : Senior High School</h2>
+            <font color="red">
+              <h1>Competition and Experience</h1>
+            </font>
+            <h2>2013: 2nd Lomba Mendongeng Kinder</h2>
+            <h2>2016: Pesta Siaga Kota</h2>
+            <h2>2017: 2nd FLS2N Mendongeng</h2>
+            <h2>2015-2018: Pararel Rank 1st</h2>
+            <h2>2017: Persami Penggalang 3rd</h2>
+            <h2>2018: MAPSI CERIS at Province</h2>
+            <h2>2018: 4th Siswa Teladan City Kota</h2>
+            <h2>2018: Last UN </h2>
+            <h2>2018: 1st Nihai Imtihan at Village</h2>
+            <h2>2017: 3rd Pidato Pekan Madrasah Kota</h2>
+            <h2>2019: 3rd Red Cross Provinsi LCC</h2>
+            <h2>2019-2024: 1st Pararel Rank</h2>
+            <h2>2022: International English Festival Olympiad 1st</h2>
+            <h2>2022: Silver PSSO Sociology</h2>
+            <h2>2023: Bronze Computer IYSO</h2>
+            <h2>2023: 1st Winner National ICT AWARDS TANGSEL</h2>
+            <h2>2024: Gold Winner PPKn SSSC</h2>
+            <h2>2024: Sliver Winner Informatics SSSC</h2>
+            <h2>2024: Krenova 5th Kota</h2>
+            <h2> OSN/year but never won</h2>
+            <h2>Scout, RedCroos, Programing ExtraCuricula</h2>
+            <h2>Now Passion and my skill is Pemrograman Basic</h2>
+          </div>
+          <p></p>
+        </div>
+        <br>
+        <br>
+        <marquee width="100%" direction="left">"Hard Times Create Strong Men, Strong Men Create Good Times, Good Times Create Weak Men, Weak Men Create Hard Times"</marquee>
+        <br>
+        <h5>
+          <b> Follow Me On</b>
+          <div class="name">
+            <i align="center">SecretDiscorder©</i>
+          </div>
+        </h5>
+        <br>
+        <br>
+        <a href="https://github.com/SecretDiscorder">
+          <img src="/static/github.png" height="25" width="25">
+        </a>
+        <a href="https://youtube.com/@BimaSeven">
+          <img src="/static/yt.png" height="25" width="25">
+        </a>
+        <a href="https://bimakharizdev.my.id">
+          <img src="/static/ig.png" height="25" width="25">
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

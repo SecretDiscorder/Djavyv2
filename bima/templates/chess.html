@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      .container {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .board {
+        width: 400px;
+        margin: 20px auto;
+      }
+
+      .buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      button {
+        color: #fff;
+        background-color: #000;
+        border: none;
+        width: 120px;
+        height: 40px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #434343;
+      }
+
+      .move-history {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+        height: 100px;
+        width: 400px;
+        overflow-y: scroll;
+        background-color: #f2f2f2;
+      }
+    </style>
+    <link rel="stylesheet" href="{% static 'chessboard-1.0.0.min.css' %}">
+    <title>ꉓꃅꍟꌗꌗ ꁅꍏꎭꍟ</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>ꉓꃅꍟꌗꌗ ꁅꍏꎭꍟ</h1>
+      <div class="board" id="board"></div>
+      <div class="buttons">
+        <button class="play-again">Play Again</button>
+        <button class="set-pos">Set Position</button>
+        <button class="flip-board">Flip Board</button>
+      </div>
+      <div id="move-history" class="move-history"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{% static 'chessboard-1.0.0.min.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script>
+      // Wait for the DOM to be fully loaded before executing code
+      document.addEventListener('DOMContentLoaded', () => {
+        let board = null; // Initialize the chessboard
+        const game = new Chess(); // Create new Chess.js game instance
+        const moveHistory = document.getElementById('move-history'); // Get move history container
+        let moveCount = 1; // Initialize the move count
+        let userColor = 'w'; // Initialize the user's color as white
+        // Function to make a random move for the computer
+        const makeRandomMove = () => {
+          const possibleMoves = game.moves();
+          if (game.game_over()) {
+            alert("Checkmate!");
+          } else {
+            const randomIdx = Math.floor(Math.random() * possibleMoves.length);
+            const move = possibleMoves[randomIdx];
+            game.move(move);
+            board.position(game.fen());
+            recordMove(move, moveCount); // Record and display the move with move count
+            moveCount++; // Increament the move count
+          }
+        };
+        // Function to record and display a move in the move history
+        const recordMove = (move, count) => {
+          const formattedMove = count % 2 === 1 ? `${Math.ceil(count / 2)}. ${move}` : `${move} -`;
+          moveHistory.textContent += formattedMove + ' ';
+          moveHistory.scrollTop = moveHistory.scrollHeight; // Auto-scroll to the latest move
+        };
+        // Function to handle the start of a drag position
+        const onDragStart = (source, piece) => {
+          // Allow the user to drag only their own pieces based on color
+          return !game.game_over() && piece.search(userColor) === 0;
+        };
+        // Function to handle a piece drop on the board
+        const onDrop = (source, target) => {
+          const move = game.move({
+            from: source,
+            to: target,
+            promotion: 'q',
+          });
+          if (move === null) return 'snapback';
+          window.setTimeout(makeRandomMove, 250);
+          recordMove(move.san, moveCount); // Record and display the move with move count
+          moveCount++;
+        };
+        // Function to handle the end of a piece snap animation
+        const onSnapEnd = () => {
+          board.position(game.fen());
+        };
+        // Configuration options for the chessboard
+        const boardConfig = {
+          showNotation: true,
+          draggable: true,
+          position: 'start',
+          onDragStart,
+          onDrop,
+          onSnapEnd,
+          moveSpeed: 'fast',
+          snapBackSpeed: 500,
+          snapSpeed: 100,
+        };
+        // Initialize the chessboard
+        board = Chessboard('board', boardConfig);
+        // Event listener for the "Play Again" button
+        document.querySelector('.play-again').addEventListener('click', () => {
+          game.reset();
+          board.start();
+          moveHistory.textContent = '';
+          moveCount = 1;
+          userColor = 'w';
+        });
+        // Event listener for the "Set Position" button
+        document.querySelector('.set-pos').addEventListener('click', () => {
+          const fen = prompt("Enter the FEN notation for the desired position!");
+          if (fen !== null) {
+            if (game.load(fen)) {
+              board.position(fen);
+              moveHistory.textContent = '';
+              moveCount = 1;
+              userColor = 'w';
+            } else {
+              alert("Invalid FEN notation. Please try again.");
+            }
+          }
+        });
+        // Event listener for the "Flip Board" button
+        document.querySelector('.flip-board').addEventListener('click', () => {
+          board.flip();
+          makeRandomMove();
+          // Toggle user's color after flipping the board
+          userColor = userColor === 'w' ? 'b' : 'w';
+        });
+      });
+    </script>
+  </body>
+</html>

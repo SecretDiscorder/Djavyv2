@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perplexity AI Chat</title>
+    <style>
+        input {
+            margin-bottom: 10px;
+            height: 50px;
+            width: 100%;
+            font-size: 16px;
+        }
+        textarea {
+            resize: none;
+            margin-top: -2px;
+            padding: 10px;
+            width: calc(100% - 20px);
+            height: 400px;
+            font-size: 16px;
+            direction: rtl;
+            text-align: right;
+            overflow: auto;
+            white-space: pre;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Perplexity AI Chat</h1>
+    <div id="chat-container">
+        <form action="/perplexity/" method="post">
+            {% csrf_token %}
+            <div>
+                <label for="user-input">You:</label>
+                <input type="text" id="user-input" name="user_input" placeholder="Type your message...">
+            </div>
+            <button type="submit">Send</button>
+        </form>
+        <div id="chat-log">
+            {% if answers %}
+                <textarea>{{ answers }}</textarea> 
+            {% endif %}
+            {% if error %}
+                <p>Error: {{ error }}</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

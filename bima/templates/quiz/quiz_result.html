@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .quiz-list {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 20px;
+        }
+        .quiz-card {
+            background: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .quiz-card h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 0 0 10px;
+        }
+        .quiz-card p {
+            font-size: 1rem;
+            color: #666;
+            margin: 0;
+        }
+        .btn-details {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn-details:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+
+
+    <title>Quiz Result</title>
+</head>
+<body>
+<div class="container">
+<div class="quiz-list">
+<h1>Quiz Results for "{{ quiz.title }}"</h1>
+    <p>Your score: {{ score }} / {{ quiz.question_set.count }}</p>
+    <a href="{% url 'quiz_list' %}">Back to Quiz List</a>
+</div>
+</div>
+</body>
+</html>

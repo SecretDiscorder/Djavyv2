@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<style>
+          a {
+            text-decoration: none;
+	  }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+            background-position: center;
+            background-repeat: repeat;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+            h1 {
+                text-align: center;
+                margin-top: 20px;
+                color: white;
+            }
+
+            label {
+                display: block;
+                text-align: center;
+                margin-top: 10px;
+                font-size: 18px;
+            }
+
+            textarea {
+                width: 80%;
+                height: 200px;
+                font-size: 18px;
+                margin: 20px auto;
+                display: block;
+                color: white;
+                background-color: #333;
+                border: 1px solid #555;
+                border-radius: 5px;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+
+            input[type="submit"],
+            button {
+                display: block;
+                margin: 20px auto;
+                padding: 10px 20px;
+                font-size: 16px;
+                border-radius: 5px;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                transition: background-color 0.2s, color 0.2s;
+                cursor: pointer;
+            }
+
+            input[type="submit"]:hover,
+            button:hover {
+                background-color: #f2f2f2;
+            }
+
+            img {
+                display: block;
+                margin: 20px auto;
+                max-width: 100%;
+                height: auto;
+                border: 2px solid #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #000e47;
+				margin: 0;
+				padding: 0;
+			}
+
+			h1 {
+				text-align: center;
+				margin-top: 20px;
+				color: white;
+			}
+
+			.container {
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px;
+			}
+
+			video {
+				display: block;
+				margin: 0 auto;
+				max-width: 100%;
+				height: auto;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+
+			canvas {
+				display: none;
+			}
+
+			button {
+				display: block;
+				margin: 20px auto;
+				padding: 10px 20px;
+				font-size: 16px;
+				border-radius: 5px;
+				background-color: #fff;
+				border: 1px solid #ccc;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				transition: background-color 0.2s, color 0.2s;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: #f2f2f2;
+			}
+
+			select {
+				display: block;
+				margin: 20px auto;
+				padding: 10px;
+				font-size: 16px;
+				border-radius: 5px;
+				background-color: #fff;
+				border: 1px solid #ccc;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+
+			#captured_image_container {
+				display: block;
+				margin: 0 auto;
+				max-width: 100%;
+				height: auto;
+				border-radius: 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				text-align: center;
+				margin-top: 20px;
+			}
+		</style>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Webcam Monitor</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	</head>
+	<body>
+		<h1>Webcam Monitor</h1>
+		<div>
+			<video id="video" width="600" height="800" autoplay></video>
+			<canvas id="canvas" width="600" height="800" style="display:none;"></canvas>
+			<br></br>   
+			<button id="front_camera_button"><a href='http://127.0.0.1:8000/monitorb'>Front Camera</a></button>
+			<button id="back_camera_button"><a href='http://127.0.0.1:8000/monitor'></a>Back Camera</a></button>
+			<select id="filter_select">
+				<option value="cartoonize">Cartoonize</option>
+				<option value="apply_filter">Contour Filter</option>
+				<option value="model">Pixel Filter</option>
+				<option value="blur">Blur Filter</option>
+				<option value="emboss">EMBOSS Filter</option>
+				<option value="edge">EDGE Filter</option>
+				<option value="point">POINTILIS Filter</option>
+				<option value="abstrak">Abstrak Filter</option>
+			</select>
+			<button id="capture_button">Capture</button>
+		</div>
+		<div id="captured_image_container"></div>
+
+		<script>
+				const video = document.getElementById('video');
+				const canvas = document.getElementById('canvas');
+				const context = canvas.getContext('2d');
+				const frontCameraButton = document.getElementById('front_camera_button');
+				const backCameraButton = document.getElementById('back_camera_button');
+				const captureButton = document.getElementById('capture_button');
+				const filterSelect = document.getElementById('filter_select');
+
+				let currentCamera = 'environment'; // Default to back camera
+
+				// Function to start video stream with selected camera
+				function startVideoStream(camera) {
+					navigator.mediaDevices.getUserMedia({ video: true })
+						.then((stream) => {
+							video.srcObject = stream;
+							video.play(); // Start playing the video
+						})
+						.catch((error) => {
+							console.error('Error accessing webcam:', error);
+						});
+				}
+
+				// Initially start video stream with back camera
+				startVideoStream(currentCamera);
+
+				// Switch to front camera when front camera button is clicked
+				frontCameraButton.addEventListener('click', () => {
+					currentCamera = 'user';
+					startVideoStream(currentCamera);
+				});
+
+				// Switch to back camera when back camera button is clicked
+				backCameraButton.addEventListener('click', () => {
+					currentCamera = 'environment';
+					startVideoStream(currentCamera);
+				});
+
+				captureButton.addEventListener('click', () => {
+					// Show canvas temporarily
+					canvas.style.display = 'block';
+
+					// Draw the current frame from video onto the canvas
+					context.drawImage(video, 0, 0, canvas.width, canvas.height);
+					
+					// Get the image data from the canvas
+					const imageData = canvas.toDataURL('image/jpeg');
+
+					// Hide canvas again
+					canvas.style.display = 'none';
+
+					// Get the selected filter
+					const selectedFilter = filterSelect.value;
+
+					// Send the captured image and selected filter to the server
+					$.ajax({
+						url: '/process_image/', // Change this to match your Django endpoint
+						type: 'POST',
+						data: {
+							'image_data': imageData,
+							'filter': selectedFilter
+						},
+						success: function(response) {
+							// If image processing is successful, display the result
+							const filteredImageData = response.image_data;
+							const filteredImage = document.createElement('img');
+							filteredImage.src = 'data:image/jpeg;base64,' + filteredImageData;
+							filteredImage.style.width = '100%';
+							filteredImage.style.maxWidth = '640px';
+
+							const imageContainer = document.getElementById('captured_image_container');
+							imageContainer.innerHTML = ''; // Clear previous images
+							imageContainer.appendChild(filteredImage);
+						},
+						error: function(xhr, status, error) {
+							console.error('Error processing image:', error);
+						}
+					});
+				});
+
+		</script>
+	</body>
+</html>

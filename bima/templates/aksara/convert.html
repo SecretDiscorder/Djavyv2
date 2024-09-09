@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Javanese:wght@400..700&display=swap" rel="stylesheet">
+    <style>
+      a {
+        text-decoration: none;
+      }
+
+      body {
+        background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+        color: white;
+      }
+
+      label {
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+        font-size: 18px;
+      }
+
+      textarea {
+        width: 80%;
+        height: 200px;
+        font-size: 18px;
+        margin: 20px auto;
+        display: block;
+        color: white;
+        background-color: #333;
+        border: 1px solid #555;
+        border-radius: 5px;
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      input[type="submit"],
+      button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s, color 0.2s;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover,
+      button:hover {
+        background-color: #f2f2f2;
+      }
+
+      img {
+        display: block;
+        margin: 20px auto;
+        max-width: 100%;
+        height: auto;
+        border: 2px solid #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+    <title>Aksara Converter</title>
+  </head>
+  <body style="font-family: 'AksaraJawa', sans-serif;">
+    <h1>Aksara To Latin Converter</h1>
+    <button>
+      <a href="aksara_converter_image">Aksara ke latin</a>
+    </button>
+    <h1>Latin To Aksara Converter</h1>
+    <form method="post" action="{% url 'aksara_converter' %}"> {% csrf_token %} <label for="text_to_convert">Enter text:</label>
+      <textarea id="text_to_convert" name="text_to_convert" required>{{ converted_text }}</textarea>
+      <button type="submit">Convert</button>
+    </form>
+    <img src="data:image/png;base64,{{ image }}" alt="Generated Image">
+  </body>
+</html>

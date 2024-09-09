@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIMA APPS</title>
+    <style>
+      /* Reset default styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-image: url("https://i.ibb.co/6vmSLQP/background.webp");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: repeat;
+        background-size: cover;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 20px;
+        font-size: 2.5rem;
+        color: #ffcc00;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .gallery-container {
+        width: 100%;
+        max-width: 1600px;
+        margin: 20px auto;
+        position: relative;
+        padding: 20px 0;
+      }
+
+      .gallery {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        padding: 0 20px;
+      }
+
+      .boardcard {
+        width: 200px;
+        height: 200px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .boardcard:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .boardcard a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color: #333;
+        text-align: center;
+      }
+
+      .boardcard img {
+        width: 80%;
+        height: 80%;
+        object-fit: cover;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+      }
+
+      .boardcard:hover img {
+        transform: scale(1.1);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .page-link {
+        margin: 0 5px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: #ffffff;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s;
+      }
+
+      .page-link.active {
+        background-color: #0056b3;
+      }
+
+      .page-link:hover {
+        background-color: #0056b3;
+      }
+
+      /* Sidebar Styles */
+      #sidebar {
+        position: fixed;
+        left: -250px;
+        width: 250px;
+        height: 100%;
+        background: #042331;
+        transition: all .5s ease;
+        z-index: 1000;
+      }
+
+      #sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      #sidebar ul a {
+        display: block;
+        height: 65px;
+        line-height: 65px;
+        font-size: 18px;
+        color: white;
+        padding-left: 20px;
+        text-decoration: none;
+        transition: background-color .4s, padding-left .4s;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+      }
+
+      #sidebar ul a:hover {
+        background-color: #0a5275;
+        padding-left: 30px;
+      }
+
+      label #btn,
+      label #cancel {
+        position: absolute;
+        background: #042331;
+        border-radius: 3px;
+        cursor: pointer;
+        z-index: 1001;
+      }
+
+      label #btn {
+        left: 20px;
+        top: 20px;
+        font-size: 30px;
+        color: white;
+        padding: 6px 12px;
+        transition: all .5s;
+      }
+
+      label #cancel {
+        left: -195px;
+        top: 20px;
+        font-size: 30px;
+        color: #0a5275;
+        padding: 4px 9px;
+        transition: all .5s ease;
+      }
+
+      #check {
+        display: none;
+      }
+
+      #check:checked~#sidebar {
+        left: 0;
+      }
+
+      #check:checked~label #btn {
+        left: 250px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #check:checked~label #cancel {
+        left: 195px;
+      }
+
+      #check:checked~section {
+        margin-left: 250px;
+      }
+
+      section {
+        background: url(bg.jpeg) no-repeat;
+        background-position: center;
+        background-size: cover;
+        height: 100vh;
+        transition: all .5s;
+      }
+
+      /* Smooth scrolling effect */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .boardcard {
+          width: 150px;
+          height: 150px;
+        }
+
+        .boardcard img {
+          width: 70%;
+          height: 70%;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+      }
+    </style>
+
+  </head>
+  <body>
+    <header>
+      <input type="checkbox" id="check">
+      <label for="check">
+        <span id="btn">&#9776;</span>
+        <span id="cancel">&times;</span>
+      </label>
+      <nav id="sidebar">
+        <ul>
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="/static/jaya.pdf">Documentation</a>
+          </li>
+          <li>
+            <a href="https://github.com/SecretDiscorder">Project</a>
+          </li>
+          <li>
+            <a href="/profile">Achievement</a>
+          </li>
+          <li>
+            <a href="/static/2045.pdf">Programming Books</a>
+          </li>
+          <li>
+            <a href="https://drive.google.com/file/d/1aXYmrKDgrmiLfpixH0QfnjhJi2p2a_l4/view">Auto Biography</a>
+          </li>
+          <li>
+            <a href="/project">Gallery</a>
+          </li>
+          <li>
+            <a href="/base">My Works</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <section class="gallery-container">
+      <h1>Project Apps</h1>
+      <div class="gallery">
+        <div class="boardcard">
+          <a href="/spldtv/">
+            <b>SPLDV / SPLTV</b>
+            <img src="/static/assets/images/algebra.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/spinwheel/">
+            <b>Spinning Wheel</b>
+            <img src="/static/assets/images/spin.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/diff/">
+            <b>Turunan</b>
+            <img src="/static/assets/images/algebra.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/chess/">
+            <b>Catur Bot</b>
+            <img src="/static/assets/images/chess.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/statistics/">
+            <b>Statistika</b>
+            <img src="/static/assets/images/statistics.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/tictac/">
+            <b>TicTacToe</b>
+            <img src="/static/assets/images/tic-tac-toe.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/quiz/">
+            <b>Quiz Game</b>
+            <img src="/static/assets/images/quiz.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/polino/">
+            <b>Polinomial</b>
+            <img src="/static/assets/images/poli.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/static/antropologi.pdf">
+            <b>Antropologi</b>
+            <img src="/static/assets/images/antro.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/static/sejarah.pdf">
+            <b>Sejarah</b>
+            <img src="/static/assets/images/sejarah.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="https://drive.sma1pecangaan.sch.id:9001/s/mi6poSTd9HESMnb/download/webbook_library.apk">
+            <b>Library Books</b>
+            <img src="/static/assets/images/library.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/algebra/">
+            <b>Matrixs</b>
+            <img src="/static/assets/images/matrix.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/inequality/">
+            <b>Algebra</b>
+            <img src="/static/assets/images/algebra.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/quran/">
+            <b>Al-Quran</b>
+            <img src="/static/assets/images/quran.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/static/MyBrowser.apk">
+            <b>PBSSI Browser</b>
+            <img src="/static/assets/images/cam.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="https://github.com/SecretDiscorder/djavy/releases/tag/B-Djavy">
+            <b>Djavy Mobile</b>
+            <img src="/static/assets/images/kivy.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/translator/">
+            <b>Translator</b>
+            <img src="/static/assets/images/trans.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/probli/">
+            <b>Probabilitas</b>
+            <img src="/static/assets/images/math.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/aksara_converter/">
+            <b>Aksara Jawa</b>
+            <img src="/static/assets/images/aksara.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/satuan/">
+            <b>Satuan Convert</b>
+            <img src="/static/assets/images/satuan.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/prima">
+            <b>Prima FPB KPK</b>
+            <img src="/static/assets/images/prima.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/morse64">
+            <b>Sandi MBase64</b>
+            <img src="/static/assets/images/enc.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/morse">
+            <b>Sandi Morse</b>
+            <img src="/static/assets/images/morse.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/kalkulator">
+            <b>Kalkulator</b>
+            <img src="/static/assets/images/cal.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/blang">
+            <b>Programing</b>
+            <img src="/static/assets/images/code.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/youtube">
+            <b>Youtube-DL</b>
+            <img src="/static/assets/images/download.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/static/shima.pdf">
+            <b>Exambro ICT</b>
+            <img src="/static/assets/images/shima.png" height="70px" width="70px">
+          </a>
+        </div>
+        <div class="boardcard">
+          <a href="/clock">
+            <b>Jam Digital</b>
+            <img src="/static/assets/images/clock.png" height="70px" width="70px">
+          </a>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
+
