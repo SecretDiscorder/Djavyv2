@@ -2,8 +2,7 @@
 ![image](https://github.com/user-attachments/assets/19efe967-6c67-4054-aaf7-ff5470718bd0)
 
 Tested on DEBIAN 12
-![image](https://github.com/user-attachments/assets/1a673ca6-5042-4c53-82c9-7efc790d86e7) ![image](https://github.com/user-attachments/assets/b984357e-780f-45cb-ba70-61e9ce35fc93)
- ![image](https://github.com/user-attachments/assets/4ad2df5d-5ce4-470b-9020-c6e9b228c316)
+![image](https://github.com/user-attachments/assets/1a673ca6-5042-4c53-82c9-7efc790d86e7)
 
 
 Here’s a comprehensive guide for setting up and running the Djavyv2 project on Debian 12, including how to address potential errors related to `matplotlib` or `mpmath`:
