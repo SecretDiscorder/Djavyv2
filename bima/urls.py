@@ -20,6 +20,7 @@ from . import views
 from .views import StaticFilesView
 urlpatterns = [
     path('home/', views.postslist.as_view(), name='home'),
+    path('spotify/', views.spotify_player, name='spotify'),
     # route for posts
     path('post/<slug:slug>/', views.postdetail.as_view(), name='post_detail'),
     path('spldtv/', views.solve_linear_system, name='solve_linear_system'),

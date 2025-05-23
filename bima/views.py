@@ -139,6 +139,28 @@ from django.shortcuts import render
 import sympy as sp
 from django.shortcuts import render
 import yt_dlp
+import os
+from django.conf import settings
+from django.shortcuts import render
+
+def spotify_player(request):
+    static_dir = settings.BASE_DIR / 'bima/static/'
+    music_dir = os.path.join(static_dir, "music")
+        
+    
+    lyrics_dir = os.path.join(static_dir, "lyrics")
+
+    music_files = [
+        {
+            'title': os.path.splitext(f)[0],
+            'file': f'music/{f}',
+            'lyrics': f'lyrics/{os.path.splitext(f)[0]}.lrc'
+        }
+        for f in os.listdir(music_dir)
+        if f.endswith('.mp3')
+    ]
+
+    return render(request, 'spotify.html', {'songs': music_files})
 
 def spotify_to_youtube(request):
     error_message = ""
