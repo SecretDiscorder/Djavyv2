@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify Clone Player</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+    body {
+  background: url('/static/1354848.jpeg') no-repeat center center fixed;
+  background-size: cover;
+
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding-bottom: 120px;
+    }
+.lyrics-box {
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #333;
+  backdrop-filter: blur(8px);
+  color: #ccc;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: 0.3s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  background-color: #1DB954;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+.lyrics-line {
+  display: none;
+  font-size: 1.6em;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.lyrics-line.active {
+  display: block;
+  color: #1DB954;
+  font-weight: bold;
+  font-size: 4.0em;
+  opacity: 1;
+}
+.player-controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.1); /* semi transparan */
+  backdrop-filter: blur(12px);          /* efek blur float */
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;                  /* sudut membulat */
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); /* efek bayangan */
+          /* batas maksimum untuk kontrol */
+  width: 95%;
+  box-sizing: border-box;    /* pastikan padding tidak menambah ukuran */
+}
+
+
+.player-controls .track-title {
+  font-size: 1rem;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.player-controls .control-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.player-controls .control-buttons button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  transition: 0.2s;
+}
+.player-controls button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.player-controls button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.player-controls .control-buttons button:hover {
+  color: #1DB954;
+  transform: scale(1.1);
+}
+
+.player-controls .progress-wrapper {
+  width: 100%;
+  max-width: 500px;
+}
+.progress-wrapper input[type="range"] {
+  height: 6px;
+  border-radius: 10px;
+}
+
+.player-controls .volume-wrapper {
+  margin-top: 5px;
+  width: 150px;
+}
+#visualizer {
+  position: fixed; /* atau fixed jika ingin tetap di tempat saat scroll */
+  top: 0;
+  left: 0;
+  width: 100%;
+  color: white;
+  height: 100%; /* setengah dari tinggi viewport */
+  z-index: 0; /* pastikan lebih rendah dari audio control */
+  border-radius: 0; /* hapus jika ingin menyatu */
+  box-shadow: 0 0 20px rgba(29,185,84,0.3);
+  background: rgba(0, 0, 0, 0.2); /* efek transparan jika perlu */
+  pointer-events: none; /* agar tidak mengganggu klik elemen lain */
+}
+
+
+
+    .track-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    input[type="range"] {
+      accent-color: #1DB954;
+    }
+
+    /* Sleep Timer Popup */
+    .sleep-popup {
+      position: fixed;
+      bottom: 140px;
+      right: 20px;
+      background-color: rgba(40, 40, 40, 0.95);
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1050;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      font-size: 0.9em;
+
+  animation: fadeIn 0.3s ease-in-out;
+  border: 1px solid #444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+    .sleep-popup .sleep-icon {
+      font-size: 1.4em;
+    }
+
+    .d-none {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container text-center mt-4">
+<h2 class="mb-4 text-white" style="font-size: 2.5rem; font-weight: 600;">
+  <span style="color:#1DB954;">Spotify</span> Clone Player 🎧
+</h2>
+
+
+  <!-- Track Selector -->
+  <div class="mb-3">
+    <select id="trackSelector" class="form-select bg-dark text-white">
+      {% for song in songs %}
+        <option value="{{ song.file }}" data-lyrics="{{ song.lyrics }}">{{ song.title }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Lyrics -->
+  <div class="lyrics-box" id="lyricsBox">
+    <div class="text-muted">Memuat lirik...</div>
+  </div>
+
+  <!-- Sleep Timer Input -->
+
+
+
+
+<canvas id="visualizer"></canvas>
+<!-- Sleep Timer Popup -->
+<div id="sleepTimerPopup" class="sleep-popup d-none">
+  <span class="sleep-icon">⏰</span>
+  <span id="sleepCountdown">00:00</span>
+</div>
+
+<!-- Player Controls -->
+<div class="player-controls">
+  <div class="track-title" id="trackTitle">Memuat lagu...</div>
+
+  <div class="control-buttons">
+<button onclick="previousTrack()" title="Sebelumnya">⏮️</button>
+<button id="playPauseBtn" onclick="togglePlay()" title="Putar/Jeda" style="font-size: 1.8rem;">⏯️</button>
+<button onclick="nextTrack()" title="Selanjutnya">⏭️</button>
+
+  </div>
+
+  <div class="progress-wrapper">
+    <input type="range" id="progressBar" value="0" min="0" max="100" step="0.1" class="form-range">
+    <div class="d-flex justify-content-between text-white-50" style="font-size: 0.8em;">
+      <div id="currentTime">0:00</div>
+      <div id="duration">0:00</div>
+    </div>
+  </div>
+<div class="mb-3 text-start" style="max-width: 200px; margin: 0 auto;">
+  <label for="sleepTimerInput" class="form-label text-white">Set Sleep Timer (sec):</label>
+  <div class="d-flex gap-2">
+    <input type="number" id="sleepTimerInput" class="form-control bg-dark text-white" placeholder="60">
+    <button class="btn btn-primary" onclick="setSleepTimer()">Start</button>
+  </div>
+</div>
+  <div class="volume-wrapper">
+    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" class="form-range">
+  </div>
+
+
+
+
+  <audio id="audioPlayer"></audio>
+</div>
+<script>
+  const audio = document.getElementById('audioPlayer');
+  const lyricsBox = document.getElementById('lyricsBox');
+  const selector = document.getElementById('trackSelector');
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  const trackTitle = document.getElementById('trackTitle');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const progressBar = document.getElementById('progressBar');
+  const currentTimeElem = document.getElementById('currentTime');
+  const durationElem = document.getElementById('duration');
+  const sleepTimerInput = document.getElementById('sleepTimerInput');
+
+  const sleepPopup = document.getElementById('sleepTimerPopup');
+  const sleepCountdown = document.getElementById('sleepCountdown');
+
+  let lyrics = [];
+  let currentIndex = 0;
+  let songOptions = Array.from(selector.options);
+
+  let sleepTimer;
+  let sleepInterval;
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext('2d');
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const audioSource = audioCtx.createMediaElementSource(audio);
+const analyser = audioCtx.createAnalyser();
+audioSource.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+analyser.fftSize = 64;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+function drawSpectrum() {
+  requestAnimationFrame(drawSpectrum);
+  analyser.getByteFrequencyData(dataArray);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const barWidth = (canvas.width / bufferLength) - 2;
+  let x = 0;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i];
+    const r = 29, g = 185, b = 84;
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+    x += barWidth + 2;
+  }
+}
+drawSpectrum();
+
+// resume audio context on user gesture
+document.body.addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+});
+
+/*
+  function updateLyrics(currentTime) {
+    const lines = lyricsBox.children;
+    for (let i = 0; i < lyrics.length; i++) {
+      if (currentTime >= lyrics[i].time && (!lyrics[i + 1] || currentTime < lyrics[i + 1].time)) {
+        for (let j = 0; j < lines.length; j++) lines[j].classList.remove('active');
+        lines[i].classList.add('active');
+        lyricsBox.scrollTop = lines[i].offsetTop - lyricsBox.offsetTop - 50;
+        break;
+      }
+    }
+  }*/
+  selector.addEventListener('change', async function () {
+    currentIndex = selector.selectedIndex;
+    loadTrack(currentIndex);
+  });
+
+  audio.ontimeupdate = function () {
+    updateLyrics(audio.currentTime);
+    updateProgressBar();
+    updateCurrentTime();
+  };
+// Tambahkan ini di bawah audio.ontimeupdate atau bagian awal lainnya
+audio.addEventListener('ended', () => {
+  nextTrack();
+});
+
+  volumeSlider.addEventListener('input', () => {
+    audio.volume = volumeSlider.value;
+  });
+
+  progressBar.addEventListener('input', () => {
+    if (!isNaN(audio.duration)) {
+      const seekTime = (progressBar.value / 100) * audio.duration;
+      audio.currentTime = seekTime;
+    }
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    durationElem.textContent = formatTime(audio.duration);
+  });
+
+  function updateProgressBar() {
+    if (!isNaN(audio.duration)) {
+      progressBar.value = (audio.currentTime / audio.duration) * 100;
+    }
+  }
+
+  function updateCurrentTime() {
+    currentTimeElem.textContent = formatTime(audio.currentTime);
+  }
+
+  function formatTime(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  async function loadTrack(index) {
+    const selected = songOptions[index];
+    const audioFile = selected.value;
+    const lyricsFile = selected.dataset.lyrics;
+
+    audio.src = `/static/${audioFile}`;
+    trackTitle.textContent = selected.text;
+    await loadLyrics(`/static/${lyricsFile}`);
+    audio.play();
+    playPauseBtn.textContent = "⏸";
+    startSleepTimer();
+  }
+
+  async function loadLyrics(url) {
+    const res = await fetch(url);
+    const text = await res.text();
+    lyrics = parseLRC(text);
+    renderLyrics();
+  }
+
+  function parseLRC(lrcText) {
+    return lrcText.split('\n').map(line => {
+      const match = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
+      if (match) {
+        const time = parseInt(match[1]) * 60 + parseFloat(match[2]);
+        return { time: time, text: match[3] };
+      }
+    }).filter(Boolean);
+  }
+
+  function renderLyrics() {
+    lyricsBox.innerHTML = lyrics.map(l => `<div class="lyrics-line">${l.text}</div>`).join('');
+  }
+
+function updateLyrics(currentTime) {
+  const lines = lyricsBox.children;
+  for (let i = 0; i < lyrics.length; i++) {
+    if (currentTime >= lyrics[i].time && (!lyrics[i + 1] || currentTime < lyrics[i + 1].time)) {
+      for (let j = 0; j < lines.length; j++) {
+        lines[j].classList.remove('active');
+      }
+      lines[i].classList.add('active');
+      break;
+    }
+  }
+}
+
+
+  function togglePlay() {
+    if (audio.paused) {
+      audio.play();
+      playPauseBtn.textContent = "⏸";
+      startSleepTimer();
+    } else {
+      audio.pause();
+      playPauseBtn.textContent = "▶️";
+      clearTimeout(sleepTimer);
+      clearInterval(sleepInterval);
+      sleepPopup.classList.add('d-none');
+    }
+  }
+
+  function previousTrack() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      selector.selectedIndex = currentIndex;
+      loadTrack(currentIndex);
+    }
+  }
+
+  function nextTrack() {
+    if (currentIndex < songOptions.length - 1) {
+      currentIndex++;
+      selector.selectedIndex = currentIndex;
+      loadTrack(currentIndex);
+    }
+  }
+
+  function setSleepTimer() {
+    startSleepTimer();
+  }
+
+  function startSleepTimer() {
+    const sleepTime = parseInt(sleepTimerInput.value);
+
+    if (!isNaN(sleepTime) && sleepTime > 0) {
+      clearTimeout(sleepTimer);
+      clearInterval(sleepInterval);
+
+      let remaining = sleepTime;
+
+      sleepPopup.classList.remove('d-none');
+      updateCountdownDisplay(remaining);
+
+      sleepInterval = setInterval(() => {
+        remaining--;
+        updateCountdownDisplay(remaining);
+        if (remaining <= 0) {
+          clearInterval(sleepInterval);
+          sleepPopup.classList.add('d-none');
+        }
+      }, 1000);
+
+      sleepTimer = setTimeout(() => {
+        audio.pause();
+        playPauseBtn.textContent = "▶️";
+        sleepPopup.classList.add('d-none');
+      }, sleepTime * 1000);
+    }
+  }
+
+  function updateCountdownDisplay(seconds) {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    sleepCountdown.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  window.onload = () => {
+    selector.dispatchEvent(new Event('change'));
+    audio.volume = 0.5;
+    volumeSlider.value = 0.5;
+  }
+document.addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+});
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // initial
+
+</script>
+
+</body>
+</html>
+
