@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interval Detailed Stats</title>
+    <style>
+    /* styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2 {
+    color: #2c3e50;
+}
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p.error {
+            color: #d9534f;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .results {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+        .results h2 {
+            margin-top: 0;
+        }
+        .results p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .visualizations {
+            margin-top: 20px;
+        }
+        .visualizations img {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        th, td {
+            text-align: center;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 5px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-family: 'Courier New', Courier, monospace;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #eaf2f8;
+    border: 1px solid #c8d6e5;
+    border-radius: 4px;
+    margin: 5px 0;
+    padding: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+p {
+    line-height: 1.6;
+}
+
+.error {
+    color: #e74c3c;
+    background-color: #fce4e4;
+    border: 1px solid #e74c3c;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interval Detailed Statistics</h1>
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="csv_data" placeholder="
+40-59,37
+60-79,53
+"></textarea>
+        <button type="submit">Submit</button>
+    </form>        
+        {% if stats %}
+            <h2>Statistics Summary</h2>
+            <p><strong>Mean:</strong> {{ stats.mean }}</p>
+            <p><strong>Mode:</strong> {{ stats.mode }}</p>
+            <p><strong>Median:</strong> {{ stats.median }}</p>
+            <p><strong>Range:</strong> {{ stats.range }}</p>
+            <p><strong>Number of Data Points:</strong> {{ stats.n }}</p>
+
+            <h2>Class Intervals</h2>
+            <div class="table-container">
+                <ul>
+                    {% for interval in stats.class_intervals %}
+                        <li>{{ interval.0 }} - {{ interval.1 }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Class Width</h2>
+            <div class="table-container">
+                <ul>
+                    {% for width in stats.class_width %}
+                        <li>{{ width }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Class Boundaries</h2>
+            <div class="table-container">
+                <ul>
+                    {% for boundary in stats.class_boundaries %}
+                        <li>{{ boundary.0 }} - {{ boundary.1 }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Midpoints</h2>
+            <div class="table-container">
+                <ul>
+                    {% for midpoint in stats.midpoints %}
+                        <li>{{ midpoint }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Quartiles</h2>
+            <div class="table-container">
+                <ul>
+                    {% for quartile in stats.quartiles %}
+                        <li>{{ quartile }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Deciles</h2>
+            <div class="table-container">
+                <ul>
+                    {% for decile in stats.deciles %}
+                        <li>{{ decile }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <h2>Percentiles</h2>
+            <div class="table-container">
+                <ul>
+                    {% for percentile in stats.percentiles %}
+                        <li>{{ percentile }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% elif error %}
+            <div class="error">
+                <p><strong>Error:</strong> {{ error }}</p>
+            </div>
+        {% else %}
+            <p>No data available.</p>
+        {% endif %}
+    </div>
+</body>
+
+</html>
+

@@ -1,0 +1,249 @@
+{% extends 'blog.html' %}
+
+{% block metatags %}
+<title>{{ object.title }} | Khariz-Log</title>
+
+<meta name="description" content="{{ object.metades }}">
+<meta property="og:title" content="{{ object.title }}">
+<meta property="og:site_name" content="Khariz-Log">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:description" content="{{ object.metades }}">
+<meta property="og:type" content="article">
+{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #071827;
+        color: #fff;
+    }
+
+    /* ARTICLE CONTAINER */
+
+    .article-container {
+        max-width: 950px;
+        margin: auto;
+        padding: 40px 20px 60px;
+    }
+
+    /* ARTICLE HEADER */
+
+    .article-header {
+        padding: 35px;
+        margin-bottom: 25px;
+        background: #0c2940;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px;
+    }
+
+    .article-title {
+        color: #fff;
+        font-size: clamp(1.7rem, 4vw, 2.5rem);
+        font-weight: 700;
+        line-height: 1.4;
+        margin-bottom: 18px;
+    }
+
+    .article-meta {
+        color: #8da9bc;
+        font-size: .85rem;
+        margin: 0;
+    }
+
+    /* ARTICLE CONTENT */
+
+    .article-content {
+        padding: 35px;
+        background: #0c2940;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 16px;
+        color: #d1dce5;
+        font-size: .97rem;
+        line-height: 1.9;
+        overflow-wrap: anywhere;
+    }
+
+    .article-content p {
+        margin-bottom: 20px;
+    }
+
+    .article-content h1,
+    .article-content h2,
+    .article-content h3,
+    .article-content h4 {
+        color: #fff;
+        margin: 28px 0 15px;
+        font-weight: 600;
+    }
+
+    .article-content a {
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    .article-content a:hover {
+        color: #fff;
+        text-decoration: underline;
+    }
+
+    .article-content img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 25px auto;
+        border-radius: 12px;
+    }
+
+    .article-content pre {
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 18px;
+        background: #071827;
+        border-radius: 10px;
+        color: #d1dce5;
+    }
+
+    .article-content blockquote {
+        margin: 20px 0;
+        padding: 15px 20px;
+        border-left: 4px solid #087db5;
+        background: rgba(255,255,255,.04);
+        color: #b7c9d8;
+    }
+
+    /* BACK BUTTON */
+
+    .article-footer {
+        margin-top: 25px;
+    }
+
+    .back-button {
+        display: inline-block;
+        padding: 11px 22px;
+        background: #087db5;
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: .88rem;
+        font-weight: 500;
+        transition: .25s ease;
+    }
+
+    .back-button:hover {
+        background: #0a9bdc;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 576px) {
+        .article-container {
+            padding: 25px 15px 40px;
+        }
+
+        .article-header,
+        .article-content {
+            padding: 22px;
+        }
+
+        .article-content {
+            font-size: .88rem;
+        }
+    }
+</style>
+
+<div class="article-container">
+
+    <!-- ARTICLE HEADER -->
+
+    <header class="article-header">
+
+        <h1 class="article-title">
+            {% block title %}
+                {{ object.title }}
+            {% endblock title %}
+        </h1>
+
+        <p class="article-meta">
+            {{ object.author.first_name }}
+            {{ object.author.last_name }}
+            <span> | </span>
+            {{ object.created_on }}
+        </p>
+
+    </header>
+
+    <!-- ARTICLE BODY -->
+
+    <article class="article-content">
+
+        {% autoescape off %}
+            {{ object.content|linebreaks|urlize }}
+        {% endautoescape %}
+
+    </article>
+
+    <!-- ARTICLE FOOTER -->
+
+    <div class="article-footer">
+
+        <a href="/" class="back-button">
+            ← Back to Home
+        </a>
+
+    </div>
+
+</div>
+
+{{ object.title|json_script:"article-title" }}
+{{ object.metades|default:""|json_script:"article-description" }}
+{{ object.author.get_full_name|default:object.author.username|json_script:"article-author" }}
+
+<script>
+(function () {
+    const title = JSON.parse(
+        document.getElementById("article-title").textContent
+    );
+
+    const description = JSON.parse(
+        document.getElementById("article-description").textContent
+    );
+
+    const author = JSON.parse(
+        document.getElementById("article-author").textContent
+    );
+
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": title,
+        "description": description,
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": window.location.href
+        },
+        "author": {
+            "@type": "Person",
+            "name": author
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Khariz-Log"
+        },
+        "datePublished": "{{ object.created_on|date:'c' }}",
+        "dateModified": "{{ object.created_on|date:'c' }}"
+    };
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(structuredData);
+
+    document.head.appendChild(script);
+})();
+</script>
+
+{% endblock content %}
+

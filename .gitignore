@@ -1,0 +1,12 @@
+.buildozer
+__pycache__/
+*.py[cod]
+env/
+.venv/
+venv/
+.idea/
+.vscode/
+*.log
+db.sqlite3
+.env
+.DS_Store

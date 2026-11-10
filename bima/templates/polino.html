@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polynomial Operations</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co/6vmSLQP/background.webp");
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .polynomial-input {
+            height: 80px; /* Reduced height for better fit */
+            resize: none;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-primary:focus {
+            box-shadow: none;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Polynomial Operations</h1>
+        <form method="post"> 
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="polynomial1">Polynomial 1:</label>
+                <input type="text" class="form-control polynomial-input" id="polynomial1" name="polynomial1" placeholder="Enter polynomial 1">
+            </div>
+            <div class="form-group">
+                <label for="polynomial2">Polynomial 2:</label>
+                <input type="text" class="form-control polynomial-input" id="polynomial2" name="polynomial2" placeholder="Enter polynomial 2">
+            </div>
+            <div class="form-group">
+                <label for="operation">Select operation:</label>
+                <select class="form-control" id="operation" name="operation">
+                    <option value="addition">Addition</option>
+                    <option value="multiplication">Multiplication</option>
+                    <option value="division">Division</option>
+                    <option value="roots">Roots</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Calculate</button>
+        </form>
+
+        {% if result %}
+            <div class="result-section">
+                <h2>Result:</h2>
+                <p>{{ result | safe }}</p>
+            </div>
+        {% endif %}
+
+        {% if result and operation == 'roots' %}
+            <div class="result-section mt-4">
+                <h2>Polynomial Plot:</h2>
+                <img src="polynomial_plot.png" class="img-fluid" alt="Polynomial Plot">
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

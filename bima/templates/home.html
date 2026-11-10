@@ -1,0 +1,254 @@
+{% extends "blog.html" %}
+
+{% block metatags %}
+<title>Home | Khariz-Log</title>
+<meta name="description" content="A destination for Learning">
+<meta property="og:title" content="Khariz-Log">
+<meta property="og:site_name" content="Khariz-Log">
+<meta property="og:url" content="https://bimakharizdev.my.id">
+<meta property="og:description" content="A destination for Learning">
+<meta property="og:type" content="website">
+{% endblock %}
+
+{% block content %}
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #071827;
+        color: #fff;
+    }
+
+    .home-container {
+        max-width: 1100px;
+        margin: auto;
+        padding: 40px 20px;
+    }
+
+    /* HEADER */
+
+    .home-header {
+        padding: 45px 30px;
+        margin-bottom: 35px;
+        background: #0c2940;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 18px;
+        text-align: center;
+    }
+
+    .home-header h1 {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+    }
+
+    .home-header p {
+        color: #b7c9d8;
+        margin: 12px 0 0;
+        font-size: .95rem;
+    }
+
+    /* POST CARD */
+
+    .post-card {
+        background: #0c2940;
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 15px;
+        margin-bottom: 20px;
+        transition: .25s ease;
+        overflow: hidden;
+    }
+
+    .post-card:hover {
+        transform: translateY(-4px);
+        border-color: #1689c5;
+        box-shadow: 0 10px 25px rgba(0,0,0,.2);
+    }
+
+    .post-body {
+        padding: 25px;
+    }
+
+    .post-title {
+        color: #fff;
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .post-meta {
+        color: #8da9bc;
+        font-size: .82rem;
+        margin-bottom: 18px;
+    }
+
+    .post-description {
+        color: #c5d3df;
+        font-size: .92rem;
+        line-height: 1.8;
+        margin-bottom: 22px;
+    }
+
+    /* BUTTON */
+
+    .read-button {
+        display: inline-block;
+        padding: 9px 20px;
+        color: #fff;
+        background: #087db5;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: .85rem;
+        font-weight: 500;
+        transition: .25s ease;
+    }
+
+    .read-button:hover {
+        color: #fff;
+        background: #0a9bdc;
+        text-decoration: none;
+    }
+
+    /* PAGINATION */
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin: 35px 0;
+    }
+
+    .page-button {
+        display: inline-block;
+        padding: 10px 22px;
+        color: #fff;
+        background: #0c2940;
+        border: 1px solid rgba(255,255,255,.15);
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: .85rem;
+        transition: .25s ease;
+    }
+
+    .page-button:hover {
+        background: #087db5;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 576px) {
+        .home-container {
+            padding: 25px 15px;
+        }
+
+        .home-header {
+            padding: 35px 15px;
+        }
+
+        .post-body {
+            padding: 20px;
+        }
+
+        .post-title {
+            font-size: 1.15rem;
+        }
+
+        .post-description {
+            font-size: .85rem;
+        }
+    }
+</style>
+
+<div class="home-container">
+
+    <!-- HEADER -->
+
+    <header class="home-header">
+        <h1>Welcome to Khariz-Log</h1>
+        <p>A Destination for Learning</p>
+    </header>
+
+    <!-- BLOG POSTS -->
+
+    <section class="post-list">
+
+        {% for post in posts_list %}
+
+        <article class="post-card">
+            <div class="post-body">
+
+                <h2 class="post-title">
+                    {{ post.title }}
+                </h2>
+
+                <p class="post-meta">
+                    {{ post.author.first_name }}
+                    {{ post.author.last_name }}
+                    <span> | </span>
+                    {{ post.created_on }}
+                </p>
+
+                <p class="post-description">
+                    {{ post.metades }}
+                </p>
+
+                <a
+                    href="{% url 'post_detail' post.slug %}"
+                    class="read-button"
+                >
+                    Read More →
+                </a>
+
+            </div>
+        </article>
+
+        {% empty %}
+
+        <div class="post-card">
+            <div class="post-body text-center">
+                <h2 class="post-title">No Posts Available</h2>
+                <p class="post-description">
+                    There are currently no published articles.
+                </p>
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+    <!-- PAGINATION -->
+
+    {% if is_paginated %}
+
+    <nav class="pagination" aria-label="Blog pagination">
+
+        {% if page_obj.has_previous %}
+        <a
+            href="?page={{ page_obj.previous_page_number }}"
+            class="page-button"
+        >
+            ← Previous
+        </a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+        <a
+            href="?page={{ page_obj.next_page_number }}"
+            class="page-button"
+        >
+            Next →
+        </a>
+        {% endif %}
+
+    </nav>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+

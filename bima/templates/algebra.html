@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Operations</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co/6vmSLQP/background.webp");
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1, h2 {
+            color: white;
+        }
+
+        .matrix-input {
+            height: 150px; /* Adjusted height for better fit */
+            resize: none;
+            color: white;
+            background-color: #444;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .result-textarea {
+            width: 100%;
+            height: 150px; /* Adjusted height for better fit */
+            font-size: 16px;
+            color: white;
+            background-color: #444;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        .error-message {
+            color: #f44336; /* Red color for error messages */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Matrix Operations</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="matrix_a">Matrix A</label>
+                    <textarea class="form-control matrix-input" id="matrix_a" name="matrix_a" placeholder="Enter matrix A">{{ matrix_a }}</textarea>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="matrix_b">Matrix B</label>
+                    <textarea class="form-control matrix-input" id="matrix_b" name="matrix_b" placeholder="Enter matrix B">{{ matrix_b }}</textarea>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button type="submit" name="operation" value="addition" class="btn btn-primary">Addition</button>
+                <button type="submit" name="operation" value="subtraction" class="btn btn-primary">Subtraction</button>
+                <button type="submit" name="operation" value="scalar" class="btn btn-primary">Scalar Multiplication</button>
+                <button type="submit" name="operation" value="multi" class="btn btn-primary">Matrix Multiplication</button>
+                <button type="submit" name="operation" value="division" class="btn btn-primary">Division</button>
+                <button type="submit" name="operation" value="modulo" class="btn btn-primary">Modulo</button>
+                <button type="submit" name="operation" value="floor" class="btn btn-primary">Floor Division</button>
+                <button type="submit" name="operation" value="inverse" class="btn btn-primary">Inverse</button>
+            </div>
+        </form>
+
+        {% if show_results %}
+            <div class="mt-5">
+                <h2>Matrix Result</h2>
+                <textarea class="result-textarea" readonly>{{ result }}</textarea>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="mt-5">
+                <h2>Error</h2>
+                <p class="error-message">{{ error }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

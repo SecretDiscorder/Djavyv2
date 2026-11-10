@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% block metatags %}
+    <title>Khariz-Log</title>
+    <meta name="description" content="A Destination for Learning">
+    {% endblock %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#071827">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap -->
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KG8bthSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous"
+    >
+
+    <style>
+        /* =================================
+           GLOBAL
+        ================================= */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+
+            background: #071827;
+            color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =================================
+           PAGE STRUCTURE
+        ================================= */
+
+        #bodydiv {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #nofooter {
+            flex: 1 0 auto;
+        }
+
+        /* =================================
+           NAVBAR
+        ================================= */
+
+        #topnav {
+            min-height: 70px;
+            padding: 12px 25px;
+
+            background: #0c2940;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            color: #fff !important;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .navbar-brand img {
+            width: 35px;
+            height: 35px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .nav-link {
+            color: #b7c9d8 !important;
+            font-size: .9rem;
+            font-weight: 500;
+
+            transition: .25s ease;
+        }
+
+        .nav-link:hover {
+            color: #38bdf8 !important;
+        }
+
+        /* =================================
+           MAIN CONTENT
+        ================================= */
+
+        #main-content {
+            width: 100%;
+            flex: 1;
+        }
+
+        /* =================================
+           FOOTER
+        ================================= */
+
+        #foot {
+            flex-shrink: 0;
+
+            width: 100%;
+            padding: 25px 20px;
+
+            background: #0c2940;
+            border-top: 1px solid rgba(255,255,255,.1);
+        }
+
+        .footer-title {
+            margin-bottom: 12px;
+
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+
+            gap: 12px;
+        }
+
+        .footer-content p {
+            margin: 0;
+            color: #8da9bc;
+            font-size: .8rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .footer-links a {
+            color: #38bdf8;
+            font-size: .82rem;
+            font-weight: 500;
+            transition: .25s ease;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        /* =================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 576px) {
+
+            #topnav {
+                padding: 12px 15px;
+            }
+
+            .navbar-brand {
+                font-size: 1rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-links {
+                gap: 20px;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div id="bodydiv">
+
+    <!-- =================================
+         NAVIGATION
+    ================================= -->
+
+    <div id="nofooter">
+
+        <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" id="topnav">
+
+            <div class="container-fluid">
+
+                <a class="navbar-brand" href="/">
+                    <img
+                        src="/static/assets/images/pp.png"
+                        alt="Khariz Logo"
+                    >
+                    KHARIZ-LOG
+                </a>
+
+                <div class="navbar-nav ml-auto">
+
+                    <a class="nav-link" href="/home/">
+                        Posts
+                    </a>
+
+                    <a class="nav-link" href="/profile/">
+                        About
+                    </a>
+
+                    <a class="nav-link" href="/">
+                        Portfolio
+                    </a>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+        <!-- =================================
+             PAGE CONTENT
+        ================================= -->
+
+        <main id="main-content">
+
+            {% block content %}
+            {% endblock content %}
+
+        </main>
+
+    </div>
+
+    <!-- =================================
+         FOOTER
+    ================================= -->
+
+    <footer id="foot">
+
+        <div class="container">
+
+            <h5 class="footer-title">
+                Enjoy the Blog and Stay Updated
+            </h5>
+
+            <div class="footer-content">
+
+                <p>
+                    Copyright &copy; 2026 SecretDiscorder
+                </p>
+
+                <div class="footer-links">
+
+                    <a href="/profile/">
+                        About
+                    </a>
+
+                    <a href="/">
+                        Portfolio
+                    </a>
+
+                    <a href="/home/">
+                        Posts
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</div>
+
+</body>
+</html>
+

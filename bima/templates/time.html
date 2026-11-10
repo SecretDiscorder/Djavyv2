@@ -1,0 +1,121 @@
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: repeat;
+        background-size: cover;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+      }
+
+      input[type="submit"],
+      button {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s, color 0.2s;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover,
+      button:hover {
+        background-color: #f2f2f2;
+      }
+
+      input[type='text'],
+      textarea {
+        width: 400px;
+        height: 100px;
+        font-size: 25px;
+        text-align: center;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        color: white;
+        background-color: #333;
+        border: none;
+        padding: 10px;
+        box-sizing: border-box;
+        border-radius: 5px;
+        resize: none;
+      }
+
+      .time {
+        font-family: 'Share Tech Mono', monospace;
+        text-align: center;
+        position: absolute;
+        margin: 0 auto;
+        background-color: white;
+        display: block;
+        border: 1px solid #ccc;
+        padding: 10px 20px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: red;
+        text-shadow: 0 0 20px rgba(10, 175, 230, 1), 0 0 20px rgba(10, 175, 230, 0);
+        letter-spacing: 0.05em;
+        font-size: 80px;
+        padding: 5px 0;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js" integrity="sha512-dUlSLLkxslGILhPdCkALwk4szPhp3xmZIKFtlUD+O9Lslq41Aksmdt5OGqpomDoT4FsCUH70jQU8ezZHI3v1RQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Function to update clock time
+        function updateClock() {
+          var selectedTimezone = document.getElementById('timezone-name').value;
+          // Create a DateTime object with the current time in the selected timezone
+          var timezoneDateTime = luxon.DateTime.now().setZone(selectedTimezone);
+          var hours = timezoneDateTime.hour.toString().padStart(2, '0');
+          var minutes = timezoneDateTime.minute.toString().padStart(2, '0');
+          var seconds = timezoneDateTime.second.toString().padStart(2, '0');
+          // Displaying the updated time
+          var clock = document.getElementById('clockreal');
+          clock.textContent = hours + ':' + minutes + ':' + seconds;
+        }
+        // Initial call to update clock
+        updateClock();
+        // Updating the clock every second
+        setInterval(updateClock, 1000);
+        // Bind updateClock function to the button click event
+        var updateButton = document.getElementById('update-button');
+        updateButton.addEventListener('click', function() {
+          updateClock();
+        });
+      })
+      var isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+      if (!isChrome) {
+        $('#iframeAudio').remove()
+      } else {
+        $('#playAudio').remove() // just to make sure that it will not have 2x audio in the background 
+      }
+    </script>
+  </head>
+  <body>
+    <div class="time">
+      <span>
+        <div id="clockreal"></div>
+      </span>
+      <br>
+      <b>TIMEZONE: </b>
+      <br>
+      <input type="text" id="timezone-name" value="Asia/Jakarta">
+      <input type="submit" id="update-button" value="UPDATE">
+    </div>
+  </body>
+</html>
