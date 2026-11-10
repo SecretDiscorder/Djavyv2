@@ -1,0 +1,62 @@
+Metadata-Version: 2.1
+Name: alquran-id
+Version: 0.0.3
+Summary: Al-Quran, Terjemahan Indonesia dan Tafsir Jalalayn
+Home-page: https://gitlab.com/nesstero/quran-id
+Author: nestero
+Author-email: nestero@mail.com
+License: MIT
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# Al-Quran ID
+Al Quran, Terjemahan indonesia, dan Tafsir Jalalayn
+
+# Installasi
+```shell
+$ pip install alquran-id
+```
+
+# Menggunakan Al-Quran ID
+```python
+from alquran_id import AlQuran as Quran
+
+def alquran(id_surat, id_ayat):
+    quran = Quran()
+    nama_surat = quran.Surat(id_surat)
+    ar_ayt = quran.ArNumber(id_ayat)
+    ayat = quran.Ayat(id_surat, id_ayat)
+    jml_ayat = quran.JumlahAyat(id_surat)
+    terjemahan = quran.Terjemahan(id_surat, id_ayat)
+    tafsir = quran.Tafsir(id_surat, id_ayat)
+    return nama_surat[0], nama_surat[1], ayat, jml_ayat, terjemahan, tafsir, ar_ayt
+
+quran = alquran(1, 1)
+print(f"""
+Nama Surat      = {quran[0]} / {quran[1]}
+Jumlah Ayat     = {quran[3]}
+Ayat [{quran[6]}]
+{quran[2]}
+Terjemahan
+{quran[4]}
+Tafsir
+{quran[5]}
+""")
+```
+Output
+```
+Nama Surat      = الفاتحة / Al-Fatihah (Pembukaan)
+Jumlah Ayat     = 7
+Ayat [۱]
+بسم ٱلله ٱلرحمـن ٱلرحيم
+Terjemahan
+Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang.
+Tafsir
+(Dengan nama Allah Yang Maha Pemurah lagi Maha Penyayang)
+```
+
+# Source
+Source file xml diambil dari [Tanzil](http://tanzil.net)
+
+
