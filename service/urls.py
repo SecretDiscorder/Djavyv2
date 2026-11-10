@@ -27,5 +27,5 @@ from django.views.static import serve
     
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('bima.urls'), name=""),
+    path('', include('bima.urls'), name="")
 ]

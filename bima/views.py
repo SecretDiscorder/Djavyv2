@@ -143,6 +143,64 @@ import os
 from django.conf import settings
 from django.shortcuts import render
 
+
+import os
+import mimetypes
+
+from django.conf import settings
+from django.http import FileResponse, Http404
+from django.views import View
+import os
+
+from django.conf import settings
+from django.http import FileResponse, Http404
+from django.views import View
+
+import os
+from pathlib import Path
+
+from django.conf import settings
+from django.http import Http404
+from django.shortcuts import render
+from django.views import View
+
+
+class PerfectWinnerView(View):
+    def get(self, request):
+
+        folder = (
+            Path(settings.BASE_DIR)
+            / "bima"
+            / "static"
+            / "perfect-winner"
+        )
+
+        if not folder.exists():
+            raise Http404("Folder Perfect-Winner tidak ditemukan")
+
+        images = []
+
+        allowed_extensions = {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".webp",
+            ".svg"
+        }
+
+        for file in folder.iterdir():
+            if file.is_file() and file.suffix.lower() in allowed_extensions:
+                images.append(file.name)
+
+        return render(
+            request,
+            "perfect_winner_gallery.html",
+            {
+                "images": images
+            }
+        )
+        
 def spotify_player(request):
     static_dir = settings.BASE_DIR / 'bima/static/'
     music_dir = os.path.join(static_dir, "music")
@@ -776,37 +834,68 @@ class postdetail(generic.DetailView):
 	model = posts
 	template_name = "page.html"
 
-class StaticFilesView(View):
-    def get(self, request, filename):
-        static_dir = settings.BASE_DIR / 'bima/static/'
-        file_path = os.path.join(static_dir, filename)
-        
-        # Check if the requested file exists
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            # Open the file in binary mode
-            with open(file_path, 'rb') as f:
-                # Read the file content
-                file_content = f.read()
-            
-            # Determine the content type based on the file extension
-            content_type = 'application/octet-stream'
-            if filename.endswith('.png'):
-                content_type = 'image/png'
-            elif filename.endswith('.jpg') or filename.endswith('.jpeg'):
-                content_type = 'image/jpeg'
-            elif filename.endswith('.svg'):
-                content_type = 'image/svg'
-            elif filename.endswith('.css'):
-                content_type = 'text/css'
-            elif filename.endswith('.js'):
-                content_type = 'text/javascript'
-            # Return the file content with appropriate content type
-            return HttpResponse(file_content, content_type=content_type)
-        
-        # If the file is not found, return a 404 response
-        return HttpResponse(status=404)
+import os
+import mimetypes
 
-            
+from django.conf import settings
+from django.http import Http404, FileResponse
+from django.views import View
+
+
+class StaticFilesView(View):
+    def get(self, request, filename=""):
+        static_dir = os.path.join(
+            settings.BASE_DIR,
+            'bima',
+            'static'
+        )
+
+        file_path = os.path.join(static_dir, filename)
+
+        # Keamanan: cegah akses keluar dari static directory
+        static_dir_real = os.path.realpath(static_dir)
+        file_path_real = os.path.realpath(file_path)
+
+        if not file_path_real.startswith(static_dir_real):
+            raise Http404("Invalid path")
+
+        # =========================
+        # JIKA YANG DIAKSES FOLDER
+        # =========================
+        if os.path.isdir(file_path_real):
+
+            index_file = os.path.join(
+                file_path_real,
+                'index.html'
+            )
+
+            # Otomatis buka index.html
+            if os.path.exists(index_file):
+                return FileResponse(
+                    open(index_file, 'rb'),
+                    content_type='text/html'
+                )
+
+            raise Http404(
+                "Directory found, but index.html does not exist."
+            )
+
+        # =========================
+        # JIKA YANG DIAKSES FILE
+        # =========================
+        if os.path.isfile(file_path_real):
+
+            content_type, encoding = mimetypes.guess_type(file_path_real)
+
+            if content_type is None:
+                content_type = 'application/octet-stream'
+
+            return FileResponse(
+                open(file_path_real, 'rb'),
+                content_type=content_type
+            )
+
+        raise Http404("File not found")
 def spinner(request):
     return render(request, 'spinner.html')
 @csrf_exempt
@@ -1429,37 +1518,28 @@ def satuan(request):
 def personal(request):
 
     return render(request, 'personal.html')
+
+
+from django.shortcuts import render
+from .models import Gallery
+
 def project(request):
-    images_dir = os.path.join(settings.STATIC_URL, 'image')  # Sesuaikan dengan nama direktori yang benar
-    dirs = os.path.join(settings.BASE_DIR, 'bima', 'static', 'image')  # Path lengkap ke direktori gambar
-    image_files = os.listdir(dirs)
+    category = request.GET.get('category', 'all')
 
-    image_paths = []
-    for file in image_files:
-        # Buat path lengkap ke file gambar
-        full_path = os.path.join(dirs, file)
-        
-        # Buka gambar dengan Pillow
-        image = Image.open(full_path)
-        
-        # Lakukan scaling gambar ke ukuran yang diinginkan
-        scaled_image = image.resize((300, 200))  # Ubah ukuran gambar sesuai kebutuhan
-        
-        # Simpan gambar yang telah di-scaling ke direktori tempat Anda menyimpan gambar yang di-scaling
-        scaled_image.save(os.path.join(dirs, f'{file}'))
+    images = Gallery.objects.all()
 
-        # Tambahkan path gambar yang telah di-scaling ke list image_paths
-        image_paths.append(os.path.join(images_dir, f'{file}'))
+    if category != 'all':
+        images = images.filter(category=category)
 
-    context = {
-        'image_paths': image_paths
-    }
-    
-    return render(request, 'project.html', context)
+    return render(request, 'project.html', {
+        'images': images,
+        'selected_category': category,
+    })
 
 def profile(request):
 
     return render(request, 'profile.html')
+
 
 def spinner(request):
     return render(request, 'spinner.html')

@@ -14,9 +14,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from . import views
+from .views import StaticFilesView, PerfectWinnerView
 from .views import StaticFilesView
 urlpatterns = [
     path('home/', views.postslist.as_view(), name='home'),
@@ -38,6 +41,19 @@ urlpatterns = [
     #path('process_image/', views.process_image, name='process_image'),
     path('diff/', views.derivative_view, name='derivative_view'),
     path('process_diff/', views.process_function, name='process_function'),
+
+
+    path(
+        'static/perfect-winner',
+        PerfectWinnerView.as_view(),
+        name='perfect-winner-slash'
+    ),
+
+    path(
+        'static/perfect-winner/',
+        PerfectWinnerView.as_view(),
+        name='perfect-winner'
+    ),
 
     path('quiz/', views.quiz_list, name='quiz_list'),
     path('quiz/<int:quiz_id>/', views.quiz_detail, name='quiz_detail'),
@@ -67,6 +83,15 @@ urlpatterns = [
 
     path('aksara_converter/', views.aksara_converter, name='aksara_converter'),
     path('aksara_converter/aksara_converter_image/', views.convert_image, name='convert_image'),
-    path('static/<path:filename>', StaticFilesView.as_view(), name='static-files'),
-    
+    path(
+        'static/<path:filename>',
+        StaticFilesView.as_view(),
+        name='static-files'
+    ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

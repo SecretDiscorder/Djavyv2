@@ -1,237 +1,509 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
-    <title>Simple Image Gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gallery | Bima Adhi Pratama Kharis</title>
+
     <style>
-      /* Reset default styles */
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+        /* =================================
+           ORIGINAL CSS - PRESERVED
+        ================================= */
 
-      body {
-        background-attachment: fixed;
-        margin: 0;
-        font-family: 'Poppins', sans-serif;
-        background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
-        background-position: center;
-        background-repeat: repeat;
-        background-size: cover;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        text-align: center;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      .gallery-container {
-        width: 100%;
-        max-width: 1200px;
-        /* Max width for gallery container */
-        margin: 0 auto;
-        /* Center align the gallery */
-        padding: 20px 0;
-      }
+        body {
+            background-attachment: fixed;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-image: url("https://i.ibb.co.com/6vmSLQP/background.webp");
+            background-position: center;
+            background-repeat: repeat;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
 
-      .gallery {
-        display: flex;
-        flex-wrap: wrap;
-        /* Wrap items to next line */
-        justify-content: center;
-        /* Center align items */
-        gap: 20px;
-        /* Spacing between cards */
-        padding: 0 20px;
-        /* Horizontal padding to prevent edge cutting */
-      }
+        .gallery-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
 
-      .boardcard {
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin-bottom: 20px;
-        /* Bottom margin between rows */
-        width: calc(33.33% - 20px);
-        /* Adjust card width and margin */
-      }
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px;
+        }
 
-      .boardcard img {
-        width: 100%;
-        height: 250px;
-        /* Maintain aspect ratio */
-        display: block;
-      }
+        .boardcard {
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: calc(33.33% - 20px);
+            overflow: hidden;
+        }
 
-      .pagination {
-        display: block;
-        margin-top: 20px;
-      }
+        .boardcard img {
+            width: 100%;
+            height: 250px;
+            display: block;
+        }
 
-      .page-link {
-        margin: 0 5px;
-        padding: 5px 10px;
-        background-color: #007bff;
-        color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
-      }
+        .pagination {
+            display: block;
+            margin-top: 20px;
+        }
 
-      .page-link.active {
-        background-color: #0056b3;
-      }
+        .page-link {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-      /* Sidebar Styles */
-      #sidebar {
-        position: fixed;
-        left: -250px;
-        width: 250px;
-        height: 100%;
-        background: #042331;
-        transition: all .5s ease;
-        z-index: 1000;
-        /* Ensure sidebar stays above content */
-      }
+        .page-link.active {
+            background-color: #0056b3;
+        }
 
-      #sidebar ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
+        /* SIDEBAR - ORIGINAL CSS */
 
-      #sidebar ul a {
-        display: block;
-        height: 65px;
-        line-height: 65px;
-        font-size: 20px;
-        color: white;
-        padding-left: 20px;
-        text-decoration: none;
-        transition: .4s;
-        border-bottom: 1px solid rgba(255, 255, 255, .1);
-      }
+        #sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: #042331;
+            transition: all .5s ease;
+            z-index: 1000;
+        }
 
-      #sidebar ul a:hover {
-        background-color: #0a5275;
-        padding-left: 30px;
-      }
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 70px 0 0;
+        }
 
-      label #btn,
-      label #cancel {
-        position: absolute;
-        background: #042331;
-        border-radius: 3px;
-        cursor: pointer;
-        z-index: 1001;
-        /* Ensure button stays above content */
-      }
+        #sidebar ul a {
+            display: block;
+            height: 65px;
+            line-height: 65px;
+            font-size: 20px;
+            color: white;
+            padding-left: 20px;
+            text-decoration: none;
+            transition: .4s;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
 
-      label #btn {
-        left: 20px;
-        top: 20px;
-        font-size: 30px;
-        color: white;
-        padding: 6px 12px;
-        transition: all .5s;
-      }
+        #sidebar ul a:hover {
+            background-color: #0a5275;
+            padding-left: 30px;
+        }
 
-      label #cancel {
-        left: -195px;
-        top: 20px;
-        font-size: 30px;
-        color: #0a5275;
-        padding: 4px 9px;
-        transition: all .5s ease;
-      }
+        label #btn,
+        label #cancel {
+            position: fixed;
+            background: #042331;
+            border-radius: 3px;
+            cursor: pointer;
+            z-index: 1001;
+        }
 
-      #check {
-        display: none;
-      }
+        label #btn {
+            left: 20px;
+            top: 20px;
+            font-size: 30px;
+            color: white;
+            padding: 6px 12px;
+            transition: all .5s;
+        }
 
-      #check:checked~#sidebar {
-        left: 0;
-      }
+        label #cancel {
+            left: -195px;
+            top: 20px;
+            font-size: 30px;
+            color: white;
+            padding: 4px 9px;
+            transition: all .5s ease;
+        }
 
-      #check:checked~label #btn {
-        left: 250px;
-        opacity: 0;
-        pointer-events: none;
-      }
+        #check {
+            display: none;
+        }
 
-      #check:checked~label #cancel {
-        left: 195px;
-      }
+        #check:checked ~ #sidebar {
+            left: 0;
+        }
 
-      #check:checked~section {
-        margin-left: 250px;
-      }
+        #check:checked ~ label #btn {
+            left: 250px;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-      section {
-        background: url(bg.jpeg) no-repeat;
-        background-position: center;
-        background-size: cover;
-        height: 100vh;
-        transition: all .5s;
-      }
+        #check:checked ~ label #cancel {
+            left: 195px;
+        }
 
-      section {
-        background: url(bg.jpeg) no-repeat;
-        background-position: center;
-        background-size: cover;
-        height: 100vh;
-        transition: all .5s;
-      }
+        #check:checked ~ main {
+            margin-left: 250px;
+        }
+
+        section {
+            background: url(bg.jpeg) no-repeat;
+            background-position: center;
+            background-size: cover;
+            height: 100vh;
+            transition: all .5s;
+        }
+
+        /* =================================
+           GALLERY DESIGN
+        ================================= */
+
+        .main {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 90px 25px 50px;
+            min-height: 100vh;
+            transition: all .5s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 38px;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,.5);
+        }
+
+        .header p {
+            color: #d6dce8;
+            font-size: 15px;
+        }
+
+        /* CATEGORY */
+
+        .category-menu {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .category-menu a {
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            background: rgba(4,35,49,.85);
+            transition: .3s;
+        }
+
+        .category-menu a:hover,
+        .category-menu a.active {
+            background: #0a5275;
+            border-color: #16b9e8;
+        }
+
+        /* IMAGE GRID */
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(230px, 1fr));
+            gap: 22px;
+            width: 100%;
+        }
+
+        .gallery-card {
+            background: rgba(3,15,30,.88);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,.4);
+            transition: .3s ease;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-7px);
+            border-color: #16b9e8;
+            box-shadow: 0 10px 25px rgba(0,180,255,.2);
+        }
+
+.gallery-card img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    transition: .4s;
+}
+
+        .gallery-card:hover img {
+            transform: scale(1.04);
+        }
+
+        .gallery-info {
+            padding: 16px;
+            text-align: left;
+        }
+
+        .gallery-info h3 {
+            color: white;
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .gallery-info p {
+            color: #c5d0dc;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0,0,0,.5);
+            border-radius: 12px;
+        }
+
+        /* LIGHTBOX */
+
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .lightbox img {
+            max-width: 90%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .lightbox span {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 45px;
+            cursor: pointer;
+        }
+
+        @media(max-width: 700px) {
+  
+  
+    .gallery-card img {
+        aspect-ratio: 4 / 3;
+        height: auto;
+    }
+
+            .main {
+                padding: 85px 15px 30px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .gallery-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+                gap: 12px;
+            }
+
+            .gallery-card img {
+                height: 160px;
+            }
+
+            .gallery-info {
+                padding: 10px;
+            }
+        }
+
+        @media(max-width: 380px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card-board a {
+    display: block;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.card-board a img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* BACK TO INDEX BUTTON */
+.back-index {
+    display: inline-block;
+    margin: 35px auto 20px;
+    padding: 12px 30px;
+    background: #198754;
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    transition: .3s ease;
+}
+
+.back-index:hover {
+    background: #146c43;
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(25,135,84,.4);
+}
     </style>
-  </head>
-  <body>
-    <header>
-      <input type="checkbox" id="check">
-      <label for="check">
-        <span id="btn">&#9776;</span>
-        <span id="cancel">&times;</span>
-      </label>
-      <nav id="sidebar">
-        <ul>
-          <li>
-            <a href="/">Home</a>
-          </li>
-          <li>
-            <a href="/static/jaya.pdf">Documentation</a>
-          </li>
-          <li>
-            <a href="https://github.com/SecretDiscorder">Project</a>
-          </li>
-          <li>
-            <a href="/profile">Achievement</a>
-          </li>
-          <li>
-            <a href="/static/2045.pdf">Programming Books</a>
-          </li>
-          <li>
-            <a href="https://drive.google.com/file/d/1aXYmrKDgrmiLfpixH0QfnjhJi2p2a_l4/view">Auto Biography</a>
-          </li>
-          <li>
-            <a href="/project">Gallery</a>
-          </li>
-          <li>
-            <a href="/base">My Works</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-    <section>
-      <div class="gallery-container">
-        <div class="gallery"> {% for image_path in image_paths %} <div class="boardcard">
-            <img src="{{ image_path }}" alt="Image">
-          </div> {% endfor %} </div>
-      </div>
-      <div class="pagination">
-        <!-- Generate pagination links dynamically --> {% for page_num in page_range %} <div class="page-link {% if page_num == current_page %}active{% endif %}" onclick="changePage({{ page_num }})">{{ page_num }}</div> {% endfor %}
-      </div>
-    </section>
-  </body>
+</head>
+
+<body>
+
+    <!-- MAIN GALLERY -->
+    <main class="main">
+
+        <header class="header">
+            <h1>My Gallery</h1>
+            <p>
+                Welcome to my personal collection.
+                Memories, achievements and creativity.
+            </p>
+        </header>
+
+        <!-- CATEGORY FILTER -->
+        <div class="category-menu">
+            <a href="{% url 'project' %}"
+               class="{% if selected_category == 'all' %}active{% endif %}">
+                All
+            </a>
+
+            <a href="?category=personal"
+               class="{% if selected_category == 'personal' %}active{% endif %}">
+                Personal
+            </a>
+
+            <a href="?category=achievement"
+               class="{% if selected_category == 'achievement' %}active{% endif %}">
+                Achievement
+            </a>
+
+            <a href="?category=project"
+               class="{% if selected_category == 'project' %}active{% endif %}">
+                Project
+            </a>
+
+            <a href="?category=documentation"
+               class="{% if selected_category == 'documentation' %}active{% endif %}">
+                Documentation
+            </a>
+        </div>
+
+        <!-- DYNAMIC DJANGO IMAGES -->
+        <section class="gallery-grid">
+
+            {% for item in images %}
+
+            <article class="gallery-card">
+
+                {% if item.image %}
+                <img
+                    src="{{ item.image.url }}"
+                    alt="{{ item.title }}"
+                    loading="lazy"
+                    onclick="openImage(this.src)"
+                >
+                {% endif %}
+
+                <div class="gallery-info">
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description }}</p>
+                </div>
+
+            </article>
+
+            {% empty %}
+
+            <div class="empty">
+                <h2>No Images Yet</h2>
+                <p>Your gallery collection will appear here.</p>
+            </div>
+
+            {% endfor %}
+
+        </section>
+
+    </main>
+
+    <!-- IMAGE PREVIEW -->
+    <div class="lightbox" id="lightbox" onclick="closeImage()">
+        <span>&times;</span>
+        <img id="preview" alt="Gallery Preview">
+    </div>
+
+    <script>
+        function openImage(src) {
+            const lightbox = document.getElementById('lightbox');
+            document.getElementById('preview').src = src;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeImage() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeImage();
+            }
+        });
+    </script>
+<!-- BACK TO INDEX -->
+<div>
+    <a href="/" class="back-index">
+        &#8592; Back to Index
+    </a>
+</div>
+</body>
 </html>
+
