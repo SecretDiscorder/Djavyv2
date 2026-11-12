@@ -35,6 +35,7 @@ from langdetect import detect
 import roman
 import textwrap
 import os
+from urllib.parse import unquote
 from math import factorial
 from itertools import permutations
 from langdetect.lang_detect_exception import LangDetectException
@@ -201,24 +202,114 @@ class PerfectWinnerView(View):
             }
         )
         
+def _normalize_music_and_lyrics_filenames(music_dir, lyrics_dir):
+    """Rename each MP3 and its matching LRC using the same basename.
+
+    Example: "My Song.mp3" and "My Song.lrc" become
+    "My_Song.mp3" and "My_Song.lrc". The LRC is never renamed
+    independently from its matching MP3.
+    """
+    if not os.path.isdir(music_dir):
+        return
+
+    os.makedirs(lyrics_dir, exist_ok=True)
+
+    # Match lyric files by their original basename (case-insensitive).
+    lyric_by_stem = {}
+    if os.path.isdir(lyrics_dir):
+        for lyric_name in os.listdir(lyrics_dir):
+            lyric_path = os.path.join(lyrics_dir, lyric_name)
+            if os.path.isfile(lyric_path) and lyric_name.lower().endswith(".lrc"):
+                stem = os.path.splitext(lyric_name)[0]
+                lyric_by_stem.setdefault(stem.casefold(), []).append(lyric_name)
+
+    for music_name in sorted(os.listdir(music_dir), key=str.casefold):
+        music_path = os.path.join(music_dir, music_name)
+        if not os.path.isfile(music_path) or not music_name.lower().endswith(".mp3"):
+            continue
+
+        original_stem = os.path.splitext(music_name)[0]
+        lyric_matches = lyric_by_stem.get(original_stem.casefold(), [])
+        lyric_name = lyric_matches.pop(0) if lyric_matches else None
+        lyric_path = os.path.join(lyrics_dir, lyric_name) if lyric_name else None
+
+        # Keep the audio and its lyric file on exactly the same normalized stem.
+        normalized_stem = unquote(original_stem).replace(" ", "_")
+        candidate_stem = normalized_stem
+        counter = 2
+
+        while True:
+            target_music = candidate_stem + ".mp3"
+            target_lyric = candidate_stem + ".lrc"
+            target_music_path = os.path.join(music_dir, target_music)
+            target_lyric_path = os.path.join(lyrics_dir, target_lyric)
+
+            music_collision = os.path.exists(target_music_path) and os.path.abspath(target_music_path) != os.path.abspath(music_path)
+            lyric_collision = (
+                lyric_path is not None
+                and os.path.exists(target_lyric_path)
+                and os.path.abspath(target_lyric_path) != os.path.abspath(lyric_path)
+            )
+            if not music_collision and not lyric_collision:
+                break
+
+            candidate_stem = f"{normalized_stem}__{counter}"
+            counter += 1
+
+        # Rename via temporary paths to avoid clashes when only the spacing differs.
+        if music_name != target_music:
+            temp_music_path = music_path + ".rename_tmp"
+            os.rename(music_path, temp_music_path)
+            os.rename(temp_music_path, target_music_path)
+
+        if lyric_path and lyric_name != target_lyric:
+            temp_lyric_path = lyric_path + ".rename_tmp"
+            os.rename(lyric_path, temp_lyric_path)
+            os.rename(temp_lyric_path, target_lyric_path)
+
+    # Normalize orphan LRC files too, without changing their association with a track.
+    if os.path.isdir(lyrics_dir):
+        for lyric_name in sorted(os.listdir(lyrics_dir), key=str.casefold):
+            lyric_path = os.path.join(lyrics_dir, lyric_name)
+            if not os.path.isfile(lyric_path) or not lyric_name.lower().endswith(".lrc"):
+                continue
+            normalized_name = unquote(lyric_name).replace(" ", "_")
+            if normalized_name == lyric_name:
+                continue
+            target_path = os.path.join(lyrics_dir, normalized_name)
+            if not os.path.exists(target_path):
+                os.rename(lyric_path, target_path)
+
+
 def spotify_player(request):
-    static_dir = settings.BASE_DIR / 'bima/static/'
+    static_dir = os.path.join(settings.BASE_DIR, "bima", "static")
     music_dir = os.path.join(static_dir, "music")
-        
-    
-    lyrics_dir = os.path.join(static_dir, "lyrics")
+    lyrics_dir = os.path.join(static_dir, "lrc")
 
-    music_files = [
-        {
-            'title': os.path.splitext(f)[0],
-            'file': f'music/{f}',
-            'lyrics': f'lyrics/{os.path.splitext(f)[0]}.lrc'
-        }
-        for f in os.listdir(music_dir)
-        if f.endswith('.mp3')
-    ]
+    # Rename each MP3 and its corresponding LRC as a matched pair.
+    _normalize_music_and_lyrics_filenames(music_dir, lyrics_dir)
 
-    return render(request, 'spotify.html', {'songs': music_files})
+    music_files = []
+    if os.path.isdir(music_dir):
+        for filename in sorted(os.listdir(music_dir), key=str.casefold):
+            if not filename.lower().endswith(".mp3"):
+                continue
+
+            stem = os.path.splitext(filename)[0]
+            lyrics_filename = stem + ".lrc"
+            lyrics_path = os.path.join(lyrics_dir, lyrics_filename)
+
+            music_files.append({
+                "title": stem.replace("_", " "),
+                "file": f"music/{filename}",
+                "lyrics": (
+                    f"lrc/{lyrics_filename}"
+                    if os.path.isfile(lyrics_path)
+                    else ""
+                ),
+            })
+
+    return render(request, "spotify.html", {"songs": music_files})
 
 def spotify_to_youtube(request):
     error_message = ""
@@ -843,56 +934,38 @@ from django.views import View
 
 
 class StaticFilesView(View):
+    """Serve files from bima/static without decoding URL paths a second time."""
+
     def get(self, request, filename=""):
-        static_dir = os.path.join(
-            settings.BASE_DIR,
-            'bima',
-            'static'
+        static_dir = os.path.realpath(
+            os.path.join(settings.BASE_DIR, 'bima', 'static')
         )
 
-        file_path = os.path.join(static_dir, filename)
+        # Django/WSGI has already decoded the URL path once. Do not call
+        # urllib.parse.unquote() here: doing so can corrupt literal % sequences.
+        file_path = os.path.realpath(os.path.join(static_dir, filename))
 
-        # Keamanan: cegah akses keluar dari static directory
-        static_dir_real = os.path.realpath(static_dir)
-        file_path_real = os.path.realpath(file_path)
-
-        if not file_path_real.startswith(static_dir_real):
+        # commonpath avoids the sibling-prefix issue of str.startswith().
+        try:
+            if os.path.commonpath([static_dir, file_path]) != static_dir:
+                raise Http404("Invalid path")
+        except ValueError:
             raise Http404("Invalid path")
 
-        # =========================
-        # JIKA YANG DIAKSES FOLDER
-        # =========================
-        if os.path.isdir(file_path_real):
-
-            index_file = os.path.join(
-                file_path_real,
-                'index.html'
-            )
-
-            # Otomatis buka index.html
-            if os.path.exists(index_file):
+        if os.path.isdir(file_path):
+            index_file = os.path.join(file_path, 'index.html')
+            if os.path.isfile(index_file):
                 return FileResponse(
                     open(index_file, 'rb'),
                     content_type='text/html'
                 )
+            raise Http404("Directory found, but index.html does not exist.")
 
-            raise Http404(
-                "Directory found, but index.html does not exist."
-            )
-
-        # =========================
-        # JIKA YANG DIAKSES FILE
-        # =========================
-        if os.path.isfile(file_path_real):
-
-            content_type, encoding = mimetypes.guess_type(file_path_real)
-
-            if content_type is None:
-                content_type = 'application/octet-stream'
-
+        if os.path.isfile(file_path):
+            content_type, encoding = mimetypes.guess_type(file_path)
             return FileResponse(
-                open(file_path_real, 'rb'),
-                content_type=content_type
+                open(file_path, 'rb'),
+                content_type=content_type or 'application/octet-stream'
             )
 
         raise Http404("File not found")

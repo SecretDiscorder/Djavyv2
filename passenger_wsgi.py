@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 
 # Set the environment variable to tell Django where your settings module is located
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'service.settings')
 
 # Get the WSGI application
 application = get_wsgi_application()

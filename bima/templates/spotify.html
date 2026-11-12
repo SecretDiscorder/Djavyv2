@@ -1,4 +1,4 @@
-```html
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="id">
@@ -907,7 +907,7 @@ input:focus-visible {
 
 </div>
 
-<audio id="audioPlayer" preload="metadata"></audio>
+<audio id="audioPlayer" preload="auto" playsinline></audio>
 
 <script>
 
@@ -946,10 +946,18 @@ const ctx = canvas.getContext("2d");
 
 const songs = [
     {% for song in songs %}
+    {% static song.file as song_file_url %}
+    {% if song.lyrics %}{% static song.lyrics as song_lyrics_url %}{% endif %}
     {
+        // Judul hanya untuk tampilan, bukan untuk membentuk alamat file.
         title: "{{ song.title|escapejs }}",
-        file: "{{ song.file|escapejs }}",
-        lyrics: "{{ song.lyrics|escapejs }}"
+
+        //  static sudah menghasilkan URL static yang di-encode Django.
+        // Jangan gunakan urlencode lagi karena akan mengubah %20 menjadi %2520.
+        file: "{{ song_file_url|escapejs }}",
+
+        // Lirik memakai aturan yang sama agar nama file berspasi tidak double-encode.
+        lyrics: "{% if song.lyrics %}{{ song_lyrics_url|escapejs }}{% endif %}"
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
 ];
@@ -957,11 +965,11 @@ const songs = [
 let currentIndex = 0;
 let lyrics = [];
 let currentLyricIndex = -1;
+let lyricsRequestId = 0;
 let sleepTimer = null;
 let sleepInterval = null;
-let audioContext = null;
-let analyser = null;
 let animationFrame = null;
+let visualizerTick = 0;
 
 
 /* =====================================
@@ -981,110 +989,85 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 
-function initializeAudioContext() {
-
-    if (audioContext) {
-        if (audioContext.state === "suspended") {
-            audioContext.resume();
-        }
-        return;
-    }
-
-    const AudioContextClass =
-        window.AudioContext || window.webkitAudioContext;
-
-    if (!AudioContextClass) return;
-
-    audioContext = new AudioContextClass();
-
-    const source = audioContext.createMediaElementSource(audio);
-
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 128;
-
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    drawVisualizer();
-}
-
-
 function drawVisualizer() {
-
-    if (!analyser) return;
-
     animationFrame = requestAnimationFrame(drawVisualizer);
-
-    const bufferLength = analyser.frequencyBinCount;
-    const data = new Uint8Array(bufferLength);
-
-    analyser.getByteFrequencyData(data);
 
     const width = window.innerWidth;
     const height = window.innerHeight;
-
     ctx.clearRect(0, 0, width, height);
 
-    const barWidth = width / bufferLength;
+    // Decorative animation only. It does not intercept or process audio.
+    const bars = Math.max(24, Math.min(72, Math.floor(width / 18)));
+    const barWidth = width / bars;
+    visualizerTick += audio.paused ? 0.012 : 0.055;
 
-    for (let i = 0; i < bufferLength; i++) {
-
-        const barHeight = data[i] * 0.45;
-        const x = i * barWidth;
-
-        ctx.fillStyle = `rgba(30, 215, 96, ${0.15 + data[i] / 500})`;
-
-        ctx.fillRect(
-            x,
-            height - barHeight,
-            Math.max(1, barWidth - 2),
-            barHeight
-        );
+    for (let i = 0; i < bars; i++) {
+        const wave = (Math.sin(visualizerTick + i * 0.42) + 1) / 2;
+        const barHeight = 5 + wave * (audio.paused ? 12 : 42);
+        ctx.fillStyle = `rgba(30, 215, 96, ${0.08 + wave * 0.12})`;
+        ctx.fillRect(i * barWidth, height - barHeight, Math.max(1, barWidth - 2), barHeight);
     }
 }
 
+drawVisualizer();
 
 /* =====================================
    LOAD TRACK
 ===================================== */
 
 async function loadTrack(index, autoplay = true) {
-
     if (index < 0 || index >= songs.length) return;
 
     currentIndex = index;
-
     const song = songs[index];
 
     audio.pause();
     audio.removeAttribute("src");
-
-    audio.src = `/static/${song.file}`;
     audio.load();
 
     trackTitle.textContent = song.title;
     miniTitle.textContent = song.title;
-
     document.title = `${song.title} | MusicFlow`;
-
     progressBar.value = 0;
     currentTimeElem.textContent = "0:00";
     durationElem.textContent = "0:00";
-
     playPauseBtn.textContent = "▶";
     playingStatus.textContent = "LOADING TRACK";
-
     updatePlaylist();
 
-    await loadLyrics(song.lyrics);
+    if (!song.file) {
+        playingStatus.textContent = "AUDIO URL MISSING";
+        console.error("MusicFlow: URL audio kosong. Periksa nilai song.file pada data Django.", song);
+        showNoLyrics("Lyrics unavailable.");
+        return;
+    }
+
+    console.info("MusicFlow selected track:", {
+        title: song.title,
+        audioURL: song.file,
+        lyricsURL: song.lyrics || "(tidak ada file lirik)"
+    });
+
+    // URL sudah dihasilkan oleh Django ; jangan menambah /static/ lagi.
+    audio.src = song.file;
+    audio.load();
+
+    // Ambil lirik secara paralel; jangan menunda pemanggilan 
+    loadLyrics(song.lyrics);
 
     if (autoplay) {
         try {
-            initializeAudioContext();
-            await audio.play();
+            const playRequest = audio.play();
+            await playRequest;
         } catch (error) {
-            console.warn("Playback:", error);
-            playingStatus.textContent = "PRESS PLAY TO START";
+            console.error("MusicFlow playback error:", {
+                name: error.name,
+                message: error.message,
+                source: audio.currentSrc || song.file
+            });
+            playingStatus.textContent = error.name === "NotAllowedError"
+                ? "PRESS PLAY TO START"
+                : "UNABLE TO PLAY AUDIO";
         }
     }
 }
@@ -1096,6 +1079,7 @@ async function loadTrack(index, autoplay = true) {
 
 async function loadLyrics(path) {
 
+    const requestId = ++lyricsRequestId;
     lyrics = [];
     currentLyricIndex = -1;
 
@@ -1110,13 +1094,18 @@ async function loadLyrics(path) {
 
     try {
 
-        const response = await fetch(`/static/${path}`);
+        // path sudah berupa URL lengkap yang dihasilkan oleh Django.
+        console.info("MusicFlow lyrics request:", path);
+        const response = await fetch(path, { cache: "no-cache" });
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(`Lyrics HTTP ${response.status} ${response.statusText} — ${response.url}`);
         }
 
         const text = await response.text();
+
+        // Abaikan respons lirik lama jika pengguna sudah memilih lagu lain.
+        if (requestId !== lyricsRequestId) return;
 
         lyrics = parseLRC(text);
 
@@ -1129,7 +1118,8 @@ async function loadLyrics(path) {
 
     } catch (error) {
 
-        console.error("Lyrics error:", error);
+        if (requestId !== lyricsRequestId) return;
+        console.error("Lyrics error:", { message: error.message, requestedURL: path, pageURL: window.location.href });
 
         showNoLyrics("Lyrics unavailable.");
 
@@ -1156,41 +1146,48 @@ function showNoLyrics(message = "No lyrics available.") {
 function parseLRC(text) {
 
     const result = [];
+    const sourceLines = text
+        .replace(/^\uFEFF/, "")
+        .split(/\r?\n/);
 
-    for (const line of text.split(/\r?\n/)) {
-
-        const regex = /\[(\d+):(\d{1,2}(?:\.\d+)?)\]/g;
-
+    for (const line of sourceLines) {
+        const regex = /\[(\d+):(\d{1,2}(?:[.:]\d+)?)\]/g;
         let match;
         const timestamps = [];
 
         while ((match = regex.exec(line)) !== null) {
-
-            const time =
-                parseInt(match[1], 10) * 60 +
-                parseFloat(match[2]);
-
-            timestamps.push(time);
+            const secondsPart = match[2].replace(":", ".");
+            timestamps.push(
+                parseInt(match[1], 10) * 60 + parseFloat(secondsPart)
+            );
         }
 
         const lyricText = line.replace(
-            /\[\d+:\d{1,2}(?:\.\d+)?\]/g,
+            /\[\d+:\d{1,2}(?:[.:]\d+)?\]/g,
             ""
         ).trim();
 
         if (!lyricText || !timestamps.length) continue;
 
         for (const time of timestamps) {
-            result.push({
-                time,
-                text: lyricText
-            });
+            result.push({ time, text: lyricText });
         }
+    }
+
+    // Plain .TXT fallback: display each non-empty line in sequence.
+    // It cannot synchronize because the file contains no timestamps.
+    if (result.length === 0) {
+        return sourceLines
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .map((line, index) => ({
+                time: index === 0 ? 0 : Number.POSITIVE_INFINITY,
+                text: line
+            }));
     }
 
     return result.sort((a, b) => a.time - b.time);
 }
-
 
 /* =====================================
    RENDER LYRICS
@@ -1265,32 +1262,69 @@ function updateLyrics(time) {
 ===================================== */
 
 async function togglePlay() {
+    if (!songs.length) return;
 
-    initializeAudioContext();
-
-    if (audio.paused) {
-
-        try {
-
-            await audio.play();
-
-            playPauseBtn.textContent = "Ⅱ";
-            playingStatus.textContent = "NOW PLAYING";
-
-        } catch (error) {
-
-            console.error("Playback error:", error);
-
-        }
-
-    } else {
-
-        audio.pause();
-
+    // Jika belum ada sumber, muat track pertama melalui aksi klik pengguna.
+    if (!audio.currentSrc && songs[currentIndex]) {
+        await loadTrack(currentIndex, true);
+        return;
     }
 
+    if (audio.paused) {
+        try {
+            await audio.play();
+        } catch (error) {
+            console.error("MusicFlow playback error:", error);
+            playingStatus.textContent = error.name === "NotAllowedError"
+                ? "PRESS PLAY TO START"
+                : "UNABLE TO PLAY AUDIO";
+        }
+    } else {
+        audio.pause();
+    }
 }
 
+
+audio.addEventListener("error", () => {
+    const error = audio.error;
+    const messages = {
+        1: "MEDIA ABORTED",
+        2: "NETWORK ERROR",
+        3: "AUDIO DECODE ERROR",
+        4: "AUDIO FORMAT / URL UNSUPPORTED"
+    };
+
+    const diagnostic = {
+        code: error?.code ?? null,
+        message: error?.message ?? "Unknown audio error",
+        source: audio.currentSrc,
+        networkState: audio.networkState,
+        readyState: audio.readyState
+    };
+
+    console.error("MusicFlow audio error:", diagnostic);
+    console.error("Audio troubleshooting: open this source URL in a new browser tab and verify it returns the MP3 file:", diagnostic.source);
+    playingStatus.textContent = messages[diagnostic.code] || "AUDIO ERROR";
+    if (diagnostic.code === 2 || diagnostic.code === 4) {
+        console.error("Periksa URL MP3, status HTTP, MIME type audio/mpeg, dan izin baca file di hosting.");
+    }
+});
+
+audio.addEventListener("loadedmetadata", () => {
+    console.info("MusicFlow metadata loaded:", {
+        source: audio.currentSrc,
+        duration: audio.duration
+    });
+});
+
+audio.addEventListener("canplay", () => {
+    console.info("MusicFlow audio ready:", audio.currentSrc);
+    if (audio.paused) playingStatus.textContent = "READY TO PLAY";
+});
+
+audio.addEventListener("waiting", () => {
+    if (!audio.paused) playingStatus.textContent = "BUFFERING";
+});
 
 audio.addEventListener("play", () => {
     playPauseBtn.textContent = "Ⅱ";
@@ -1538,4 +1572,4 @@ window.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-```
+
